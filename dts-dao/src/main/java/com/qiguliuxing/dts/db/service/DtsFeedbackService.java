@@ -18,32 +18,33 @@ import java.util.List;
  */
 @Service
 public class DtsFeedbackService {
-    @Autowired
-    private DtsFeedbackMapper feedbackMapper;
+	@Autowired
+	private DtsFeedbackMapper feedbackMapper;
 
-    public Integer add(DtsFeedback feedback) {
-        feedback.setAddTime(LocalDateTime.now());
-        feedback.setUpdateTime(LocalDateTime.now());
-        return feedbackMapper.insertSelective(feedback);
-    }
+	public Integer add(DtsFeedback feedback) {
+		feedback.setAddTime(LocalDateTime.now());
+		feedback.setUpdateTime(LocalDateTime.now());
+		return feedbackMapper.insertSelective(feedback);
+	}
 
-    public List<DtsFeedback> querySelective(Integer userId, String username, Integer page, Integer limit, String sort, String order) {
-        DtsFeedbackExample example = new DtsFeedbackExample();
-        DtsFeedbackExample.Criteria criteria = example.createCriteria();
+	public List<DtsFeedback> querySelective(Integer userId, String username, Integer page, Integer limit, String sort,
+			String order) {
+		DtsFeedbackExample example = new DtsFeedbackExample();
+		DtsFeedbackExample.Criteria criteria = example.createCriteria();
 
-        if (userId != null) {
-            criteria.andUserIdEqualTo(userId);
-        }
-        if (!StringUtils.isEmpty(username)) {
-            criteria.andUsernameLike("%" + username + "%");
-        }
-        criteria.andDeletedEqualTo(false);
+		if (userId != null) {
+			criteria.andUserIdEqualTo(userId);
+		}
+		if (!StringUtils.isEmpty(username)) {
+			criteria.andUsernameLike("%" + username + "%");
+		}
+		criteria.andDeletedEqualTo(false);
 
-        if (!StringUtils.isEmpty(sort) && !StringUtils.isEmpty(order)) {
-            example.setOrderByClause(sort + " " + order);
-        }
+		if (!StringUtils.isEmpty(sort) && !StringUtils.isEmpty(order)) {
+			example.setOrderByClause(sort + " " + order);
+		}
 
-        PageHelper.startPage(page, limit);
-        return feedbackMapper.selectByExample(example);
-    }
+		PageHelper.startPage(page, limit);
+		return feedbackMapper.selectByExample(example);
+	}
 }

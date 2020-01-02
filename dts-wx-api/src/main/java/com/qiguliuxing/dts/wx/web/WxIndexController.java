@@ -12,14 +12,14 @@ import com.qiguliuxing.dts.core.util.ResponseUtil;
 @RequestMapping("/wx/index")
 public class WxIndexController {
 
-    /**
-     * 测试数据
-     *
-     * @return 测试数据
-     */
-    @RequestMapping("/index")
-    public Object index() {
-        return ResponseUtil.ok("hello wx");
-    }
+	/**
+	 * 测试数据
+	 *
+	 * @return 测试数据
+	 */
+	@RequestMapping("/index")
+	public Object index() {
+		return ResponseUtil.ok("hello dts");
+	}
 
 }

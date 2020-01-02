@@ -12,19 +12,18 @@ import com.qiguliuxing.dts.db.dao.ex.StatMapper;
 @Service
 @SuppressWarnings("rawtypes")
 public class StatService {
-    @Resource
-    private StatMapper statMapper;
-
+	@Resource
+	private StatMapper statMapper;
 
 	public List<Map> statUser() {
-        return statMapper.statUser();
-    }
+		return statMapper.statUser();
+	}
 
-    public List<Map> statOrder() {
-        return statMapper.statOrder();
-    }
+	public List<Map> statOrder() {
+		return statMapper.statOrder();
+	}
 
-    public List<Map> statGoods() {
-        return statMapper.statGoods();
-    }
+	public List<Map> statGoods() {
+		return statMapper.statGoods();
+	}
 }

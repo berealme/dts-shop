@@ -10,8 +10,8 @@ import com.qiguliuxing.dts.wx.annotation.support.LoginUserHandlerMethodArgumentR
 
 @Configuration
 public class WxWebMvcConfiguration implements WebMvcConfigurer {
-    @Override
-    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
-        argumentResolvers.add(new LoginUserHandlerMethodArgumentResolver());
-    }
+	@Override
+	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+		argumentResolvers.add(new LoginUserHandlerMethodArgumentResolver());
+	}
 }

@@ -4,80 +4,81 @@ import java.io.Serializable;
 
 /**
  * 用户信息
+ * 
  * @author CHENBO
  * @since 1.0.0
  */
-public class UserInfo  implements Serializable {
-	
+public class UserInfo implements Serializable {
+
 	private static final long serialVersionUID = -5813029516433359765L;
-	
-	private Integer userId; 
+
+	private Integer userId;
 	private String nickName;
-    private String avatarUrl;
-    private String country;
-    private String province;
-    private String city;
-    private String language;
-    private Byte gender;
-    private String phone;
-    private Byte userLevel;//用户层级 0 普通用户，1 VIP用户，2 区域代理用户
-    private String userLevelDesc;//代理用户描述
+	private String avatarUrl;
+	private String country;
+	private String province;
+	private String city;
+	private String language;
+	private Byte gender;
+	private String phone;
+	private Byte userLevel;// 用户层级 0 普通用户，1 VIP用户，2 区域代理用户
+	private String userLevelDesc;// 代理用户描述
 
-    public String getCountry() {
-        return country;
-    }
+	public String getCountry() {
+		return country;
+	}
 
-    public void setCountry(String country) {
-        this.country = country;
-    }
+	public void setCountry(String country) {
+		this.country = country;
+	}
 
-    public String getProvince() {
-        return province;
-    }
+	public String getProvince() {
+		return province;
+	}
 
-    public void setProvince(String province) {
-        this.province = province;
-    }
+	public void setProvince(String province) {
+		this.province = province;
+	}
 
-    public String getCity() {
-        return city;
-    }
+	public String getCity() {
+		return city;
+	}
 
-    public void setCity(String city) {
-        this.city = city;
-    }
+	public void setCity(String city) {
+		this.city = city;
+	}
 
-    public String getLanguage() {
-        return language;
-    }
+	public String getLanguage() {
+		return language;
+	}
 
-    public void setLanguage(String language) {
-        this.language = language;
-    }
+	public void setLanguage(String language) {
+		this.language = language;
+	}
 
-    public Byte getGender() {
-        return gender;
-    }
+	public Byte getGender() {
+		return gender;
+	}
 
-    public void setGender(Byte gender) {
-        this.gender = gender;
-    }
+	public void setGender(Byte gender) {
+		this.gender = gender;
+	}
 
-    public String getNickName() {
-        return nickName;
-    }
+	public String getNickName() {
+		return nickName;
+	}
 
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
-    }
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
+	}
 
-    public String getAvatarUrl() {
-        return avatarUrl;
-    }
+	public String getAvatarUrl() {
+		return avatarUrl;
+	}
 
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
-    }
+	public void setAvatarUrl(String avatarUrl) {
+		this.avatarUrl = avatarUrl;
+	}
 
 	public Integer getUserId() {
 		return userId;
@@ -110,5 +111,5 @@ public class UserInfo  implements Serializable {
 	public void setUserLevelDesc(String userLevelDesc) {
 		this.userLevelDesc = userLevelDesc;
 	}
-	
+
 }

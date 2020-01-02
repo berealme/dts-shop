@@ -22,13 +22,13 @@ public class GetRegionService {
 	private static List<DtsRegion> DtsRegions;
 
 	protected List<DtsRegion> getDtsRegions() {
-		if(DtsRegions==null){
+		if (DtsRegions == null) {
 			createRegion();
 		}
 		return DtsRegions;
 	}
 
-	private synchronized void createRegion(){
+	private synchronized void createRegion() {
 		if (DtsRegions == null) {
 			DtsRegions = regionService.getAll();
 		}

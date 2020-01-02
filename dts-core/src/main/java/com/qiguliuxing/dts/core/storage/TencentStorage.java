@@ -25,116 +25,120 @@ import com.qcloud.cos.region.Region;
  */
 public class TencentStorage implements Storage {
 	private final Log logger = LogFactory.getLog(TencentStorage.class);
-	
-    private String secretId;
-    private String secretKey;
-    private String region;
-    private String bucketName;
 
-    private COSClient cosClient;
+	private String secretId;
+	private String secretKey;
+	private String region;
+	private String bucketName;
 
-    public String getSecretId() {
-        return secretId;
-    }
+	private COSClient cosClient;
 
-    public void setSecretId(String secretId) {
-        this.secretId = secretId;
-    }
+	public String getSecretId() {
+		return secretId;
+	}
 
-    public String getSecretKey() {
-        return secretKey;
-    }
+	public void setSecretId(String secretId) {
+		this.secretId = secretId;
+	}
 
-    public void setSecretKey(String secretKey) {
-        this.secretKey = secretKey;
-    }
+	public String getSecretKey() {
+		return secretKey;
+	}
 
-    public String getRegion() {
-        return region;
-    }
+	public void setSecretKey(String secretKey) {
+		this.secretKey = secretKey;
+	}
 
-    public void setRegion(String region) {
-        this.region = region;
-    }
+	public String getRegion() {
+		return region;
+	}
 
-    public String getBucketName() {
-        return bucketName;
-    }
+	public void setRegion(String region) {
+		this.region = region;
+	}
 
-    public void setBucketName(String bucketName) {
-        this.bucketName = bucketName;
-    }
+	public String getBucketName() {
+		return bucketName;
+	}
 
-    private COSClient getCOSClient() {
-        if (cosClient == null) {
-            // 1 初始化用户身份信息(secretId, secretKey)
-            COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
-            // 2 设置bucket的区域, COS地域的简称请参照 https://cloud.tencent.com/document/product/436/6224
-            ClientConfig clientConfig = new ClientConfig(new Region(region));
-            cosClient = new COSClient(cred, clientConfig);
-        }
+	public void setBucketName(String bucketName) {
+		this.bucketName = bucketName;
+	}
 
-        return cosClient;
-    }
+	private COSClient getCOSClient() {
+		if (cosClient == null) {
+			// 1 初始化用户身份信息(secretId, secretKey)
+			COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
+			// 2 设置bucket的区域, COS地域的简称请参照
+			// https://cloud.tencent.com/document/product/436/6224
+			ClientConfig clientConfig = new ClientConfig(new Region(region));
+			cosClient = new COSClient(cred, clientConfig);
+		}
 
-    private String getBaseUrl() {
-        return "https://" + bucketName + ".cos-website." + region + ".myqcloud.com/";
-    }
+		return cosClient;
+	}
 
-    @Override
-    public void store(InputStream inputStream, long contentLength, String contentType, String keyName) {
-        try {
-            // 简单文件上传, 最大支持 5 GB, 适用于小文件上传, 建议 20M以下的文件使用该接口
-            ObjectMetadata objectMetadata = new ObjectMetadata();
-            objectMetadata.setContentLength(contentLength);
-            objectMetadata.setContentType(contentType);
-            // 对象键（Key）是对象在存储桶中的唯一标识。例如，在对象的访问域名 `bucket1-1250000000.cos.ap-guangzhou.myqcloud.com/doc1/pic1.jpg` 中，对象键为 doc1/pic1.jpg, 详情参考 [对象键](https://cloud.tencent.com/document/product/436/13324)
-            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, keyName, inputStream, objectMetadata);
-            PutObjectResult putObjectResult = getCOSClient().putObject(putObjectRequest);
-            logger.info("腾讯云存储结果："+putObjectResult.getRequestId());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
+	private String getBaseUrl() {
+		return "https://" + bucketName + ".cos-website." + region + ".myqcloud.com/";
+	}
 
-    @Override
-    public Stream<Path> loadAll() {
-        return null;
-    }
+	@Override
+	public void store(InputStream inputStream, long contentLength, String contentType, String keyName) {
+		try {
+			// 简单文件上传, 最大支持 5 GB, 适用于小文件上传, 建议 20M以下的文件使用该接口
+			ObjectMetadata objectMetadata = new ObjectMetadata();
+			objectMetadata.setContentLength(contentLength);
+			objectMetadata.setContentType(contentType);
+			// 对象键（Key）是对象在存储桶中的唯一标识。例如，在对象的访问域名
+			// `bucket1-1250000000.cos.ap-guangzhou.myqcloud.com/doc1/pic1.jpg` 中，对象键为
+			// doc1/pic1.jpg, 详情参考
+			// [对象键](https://cloud.tencent.com/document/product/436/13324)
+			PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, keyName, inputStream, objectMetadata);
+			PutObjectResult putObjectResult = getCOSClient().putObject(putObjectRequest);
+			logger.info("腾讯云存储结果：" + putObjectResult.getRequestId());
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
 
-    @Override
-    public Path load(String keyName) {
-        return null;
-    }
+	@Override
+	public Stream<Path> loadAll() {
+		return null;
+	}
 
-    @Override
-    public Resource loadAsResource(String keyName) {
-        try {
-            URL url = new URL(getBaseUrl() + keyName);
-            Resource resource = new UrlResource(url);
-            if (resource.exists() || resource.isReadable()) {
-                return resource;
-            } else {
-                return null;
-            }
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+	@Override
+	public Path load(String keyName) {
+		return null;
+	}
 
-    @Override
-    public void delete(String keyName) {
-        try {
-            getCOSClient().deleteObject(bucketName, keyName);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+	@Override
+	public Resource loadAsResource(String keyName) {
+		try {
+			URL url = new URL(getBaseUrl() + keyName);
+			Resource resource = new UrlResource(url);
+			if (resource.exists() || resource.isReadable()) {
+				return resource;
+			} else {
+				return null;
+			}
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 
-    }
+	@Override
+	public void delete(String keyName) {
+		try {
+			getCOSClient().deleteObject(bucketName, keyName);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-    @Override
-    public String generateUrl(String keyName) {
-        return getBaseUrl() + keyName;
-    }
+	}
+
+	@Override
+	public String generateUrl(String keyName) {
+		return getBaseUrl() + keyName;
+	}
 }

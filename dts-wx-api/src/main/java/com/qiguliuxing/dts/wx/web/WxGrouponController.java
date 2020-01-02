@@ -11,6 +11,8 @@ import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,9 +20,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
-import com.qiguliuxing.dts.core.express.ExpressService;
-import com.qiguliuxing.dts.core.express.dao.ExpressInfo;
 import com.qiguliuxing.dts.core.util.ResponseUtil;
 import com.qiguliuxing.dts.core.validator.Order;
 import com.qiguliuxing.dts.core.validator.Sort;
@@ -39,6 +40,7 @@ import com.qiguliuxing.dts.db.service.DtsOrderService;
 import com.qiguliuxing.dts.db.service.DtsUserService;
 import com.qiguliuxing.dts.db.util.OrderUtil;
 import com.qiguliuxing.dts.wx.annotation.LoginUser;
+import com.qiguliuxing.dts.wx.util.WxResponseUtil;
 
 /**
  * 团购服务
@@ -49,266 +51,294 @@ import com.qiguliuxing.dts.wx.annotation.LoginUser;
 @RequestMapping("/wx/groupon")
 @Validated
 public class WxGrouponController {
+	private static final Logger logger = LoggerFactory.getLogger(WxGrouponController.class);
 
-    @Autowired
-    private DtsGrouponRulesService rulesService;
-    @Autowired
-    private DtsGrouponService grouponService;
-    @Autowired
-    private DtsGoodsService goodsService;
-    @Autowired
-    private DtsOrderService orderService;
-    @Autowired
-    private DtsOrderGoodsService orderGoodsService;
-    @Autowired
-    private DtsUserService userService;
-    @Autowired
-    private ExpressService expressService;
-    @Autowired
-    private DtsGrouponRulesService grouponRulesService;
+	@Autowired
+	private DtsGrouponRulesService rulesService;
+	@Autowired
+	private DtsGrouponService grouponService;
+	@Autowired
+	private DtsGoodsService goodsService;
+	@Autowired
+	private DtsOrderService orderService;
+	@Autowired
+	private DtsOrderGoodsService orderGoodsService;
+	@Autowired
+	private DtsUserService userService;
+	@Autowired
+	private DtsGrouponRulesService grouponRulesService;
 
-    /**
-     * 团购规则列表
-     *
-     * @param page 分页页数
-     * @param size 分页大小
-     * @return 团购规则列表
-     */
-    @GetMapping("list")
-    public Object list(@RequestParam(defaultValue = "1") Integer page,
-                       @RequestParam(defaultValue = "10") Integer size,
-                       @Sort @RequestParam(defaultValue = "add_time") String sort,
-                       @Order @RequestParam(defaultValue = "desc") String order) {
-        List<Map<String, Object>> topicList = grouponRulesService.queryList(page, size, sort, order);
-        long total = PageInfo.of(topicList).getTotal();
-        Map<String, Object> data = new HashMap<String, Object>();
-        data.put("data", topicList);
-        data.put("count", total);
-        return ResponseUtil.ok(data);
-    }
+	/**
+	 * 团购规则列表
+	 *
+	 * @param page
+	 *            分页页数
+	 * @param size
+	 *            分页大小
+	 * @return 团购规则列表
+	 */
+	@GetMapping("list")
+	public Object list(@RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue = "10") Integer size,
+			@Sort @RequestParam(defaultValue = "add_time") String sort,
+			@Order @RequestParam(defaultValue = "desc") String order) {
+		logger.info("【请求开始】团购规则列表,请求参数,page:{},size:{}", page, size);
 
-    /**
-     * 团购活动详情
-     *
-     * @param userId    用户ID
-     * @param grouponId 团购活动ID
-     * @return 团购活动详情
-     */
-    @GetMapping("detail")
-    public Object detail(@LoginUser Integer userId, @NotNull Integer grouponId) {
-        if (userId == null) {
-            return ResponseUtil.unlogin();
-        }
+		List<Map<String, Object>> topicList = grouponRulesService.queryList(page, size, sort, order);
+		long total = PageInfo.of(topicList).getTotal();
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("data", topicList);
+		data.put("count", total);
 
-        DtsGroupon groupon = grouponService.queryById(grouponId);
-        if (groupon == null) {
-            return ResponseUtil.badArgumentValue();
-        }
+		logger.info("【请求结束】团购规则列表,响应结果:{}", JSONObject.toJSONString(data));
+		return ResponseUtil.ok(data);
+	}
 
-        DtsGrouponRules rules = rulesService.queryById(groupon.getRulesId());
-        if (rules == null) {
-            return ResponseUtil.badArgumentValue();
-        }
+	/**
+	 * 团购活动详情
+	 *
+	 * @param userId
+	 *            用户ID
+	 * @param grouponId
+	 *            团购活动ID
+	 * @return 团购活动详情
+	 */
+	@GetMapping("detail")
+	public Object detail(@LoginUser Integer userId, @NotNull Integer grouponId) {
+		logger.info("【请求开始】获取团购活动详情,请求参数,userId:{},grouponId:{}", userId, grouponId);
 
-        // 订单信息
-        DtsOrder order = orderService.findById(groupon.getOrderId());
-        if (null == order) {
-            return ResponseUtil.fail(ORDER_UNKNOWN, "订单不存在");
-        }
-        if (!order.getUserId().equals(userId)) {
-            return ResponseUtil.fail(ORDER_INVALID, "不是当前用户的订单");
-        }
-        Map<String, Object> orderVo = new HashMap<String, Object>();
-        orderVo.put("id", order.getId());
-        orderVo.put("orderSn", order.getOrderSn());
-        orderVo.put("addTime", order.getAddTime());
-        orderVo.put("consignee", order.getConsignee());
-        orderVo.put("mobile", order.getMobile());
-        orderVo.put("address", order.getAddress());
-        orderVo.put("goodsPrice", order.getGoodsPrice());
-        orderVo.put("freightPrice", order.getFreightPrice());
-        orderVo.put("actualPrice", order.getActualPrice());
-        orderVo.put("orderStatusText", OrderUtil.orderStatusText(order));
-        orderVo.put("handleOption", OrderUtil.build(order));
-        orderVo.put("expCode", order.getShipChannel());
-        orderVo.put("expNo", order.getShipSn());
+		if (userId == null) {
+			logger.error("获取团购活动详情出错:用户未登录！！！");
+			return ResponseUtil.unlogin();
+		}
 
-        List<DtsOrderGoods> orderGoodsList = orderGoodsService.queryByOid(order.getId());
-        List<Map<String, Object>> orderGoodsVoList = new ArrayList<>(orderGoodsList.size());
-        for (DtsOrderGoods orderGoods : orderGoodsList) {
-            Map<String, Object> orderGoodsVo = new HashMap<>();
-            orderGoodsVo.put("id", orderGoods.getId());
-            orderGoodsVo.put("orderId", orderGoods.getOrderId());
-            orderGoodsVo.put("goodsId", orderGoods.getGoodsId());
-            orderGoodsVo.put("goodsName", orderGoods.getGoodsName());
-            orderGoodsVo.put("number", orderGoods.getNumber());
-            orderGoodsVo.put("retailPrice", orderGoods.getPrice());
-            orderGoodsVo.put("picUrl", orderGoods.getPicUrl());
-            orderGoodsVo.put("goodsSpecificationValues", orderGoods.getSpecifications());
-            orderGoodsVoList.add(orderGoodsVo);
-        }
+		DtsGroupon groupon = grouponService.queryById(grouponId);
+		if (groupon == null) {
+			return ResponseUtil.badArgumentValue();
+		}
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("orderInfo", orderVo);
-        result.put("orderGoods", orderGoodsVoList);
+		DtsGrouponRules rules = rulesService.queryById(groupon.getRulesId());
+		if (rules == null) {
+			return ResponseUtil.badArgumentValue();
+		}
 
-        // 订单状态为已发货且物流信息不为空
-        //"YTO", "800669400640887922"
+		// 订单信息
+		DtsOrder order = orderService.findById(groupon.getOrderId());
+		if (null == order) {
+			logger.error("获取团购活动详情出错:{}", ORDER_UNKNOWN.desc());
+			return WxResponseUtil.fail(ORDER_UNKNOWN);
+		}
+		if (!order.getUserId().equals(userId)) {
+			logger.error("获取团购活动详情出错:{}", ORDER_INVALID.desc());
+			return WxResponseUtil.fail(ORDER_INVALID);
+		}
+		Map<String, Object> orderVo = new HashMap<String, Object>();
+		orderVo.put("id", order.getId());
+		orderVo.put("orderSn", order.getOrderSn());
+		orderVo.put("addTime", order.getAddTime());
+		orderVo.put("consignee", order.getConsignee());
+		orderVo.put("mobile", order.getMobile());
+		orderVo.put("address", order.getAddress());
+		orderVo.put("goodsPrice", order.getGoodsPrice());
+		orderVo.put("freightPrice", order.getFreightPrice());
+		orderVo.put("actualPrice", order.getActualPrice());
+		orderVo.put("orderStatusText", OrderUtil.orderStatusText(order));
+		orderVo.put("handleOption", OrderUtil.build(order));
+		orderVo.put("expCode", order.getShipChannel());
+		orderVo.put("expNo", order.getShipSn());
+
+		List<DtsOrderGoods> orderGoodsList = orderGoodsService.queryByOid(order.getId());
+		List<Map<String, Object>> orderGoodsVoList = new ArrayList<>(orderGoodsList.size());
+		for (DtsOrderGoods orderGoods : orderGoodsList) {
+			Map<String, Object> orderGoodsVo = new HashMap<>();
+			orderGoodsVo.put("id", orderGoods.getId());
+			orderGoodsVo.put("orderId", orderGoods.getOrderId());
+			orderGoodsVo.put("goodsId", orderGoods.getGoodsId());
+			orderGoodsVo.put("goodsName", orderGoods.getGoodsName());
+			orderGoodsVo.put("number", orderGoods.getNumber());
+			orderGoodsVo.put("retailPrice", orderGoods.getPrice());
+			orderGoodsVo.put("picUrl", orderGoods.getPicUrl());
+			orderGoodsVo.put("goodsSpecificationValues", orderGoods.getSpecifications());
+			orderGoodsVoList.add(orderGoodsVo);
+		}
+
+		Map<String, Object> result = new HashMap<>();
+		result.put("orderInfo", orderVo);
+		result.put("orderGoods", orderGoodsVoList);
+
+		// 订单状态为已发货且物流信息不为空
+		// "YTO", "800669400640887922"
 		/*
 		 * if (order.getOrderStatus().equals(OrderUtil.STATUS_SHIP)) { ExpressInfo ei =
 		 * expressService.getExpressInfo(order.getShipChannel(), order.getShipSn());
 		 * result.put("expressInfo", ei); }
 		 */
 
-        UserVo creator = userService.findUserVoById(groupon.getCreatorUserId());
-        List<UserVo> joiners = new ArrayList<>();
-        joiners.add(creator);
-        int linkGrouponId;
-        // 这是一个团购发起记录
-        if (groupon.getGrouponId() == 0) {
-            linkGrouponId = groupon.getId();
-        } else {
-            linkGrouponId = groupon.getGrouponId();
+		UserVo creator = userService.findUserVoById(groupon.getCreatorUserId());
+		List<UserVo> joiners = new ArrayList<>();
+		joiners.add(creator);
+		int linkGrouponId;
+		// 这是一个团购发起记录
+		if (groupon.getGrouponId() == 0) {
+			linkGrouponId = groupon.getId();
+		} else {
+			linkGrouponId = groupon.getGrouponId();
 
-        }
-        List<DtsGroupon> groupons = grouponService.queryJoinRecord(linkGrouponId);
+		}
+		List<DtsGroupon> groupons = grouponService.queryJoinRecord(linkGrouponId);
 
-        UserVo joiner;
-        for (DtsGroupon grouponItem : groupons) {
-            joiner = userService.findUserVoById(grouponItem.getUserId());
-            joiners.add(joiner);
-        }
+		UserVo joiner;
+		for (DtsGroupon grouponItem : groupons) {
+			joiner = userService.findUserVoById(grouponItem.getUserId());
+			joiners.add(joiner);
+		}
 
-        result.put("linkGrouponId", linkGrouponId);
-        result.put("creator", creator);
-        result.put("joiners", joiners);
-        result.put("groupon", groupon);
-        result.put("rules", rules);
-        return ResponseUtil.ok(result);
-    }
+		result.put("linkGrouponId", linkGrouponId);
+		result.put("creator", creator);
+		result.put("joiners", joiners);
+		result.put("groupon", groupon);
+		result.put("rules", rules);
 
-    /**
-     * 参加团购
-     *
-     * @param grouponId 团购活动ID
-     * @return 操作结果
-     */
-    @GetMapping("join")
-    public Object join(@NotNull Integer grouponId) {
-        DtsGroupon groupon = grouponService.queryById(grouponId);
-        if (groupon == null) {
-            return ResponseUtil.badArgumentValue();
-        }
+		logger.info("【请求结束】获取团购活动详情,响应结果:{}", JSONObject.toJSONString(result));
+		return ResponseUtil.ok(result);
+	}
 
-        DtsGrouponRules rules = rulesService.queryById(groupon.getRulesId());
-        if (rules == null) {
-            return ResponseUtil.badArgumentValue();
-        }
+	/**
+	 * 参加团购
+	 *
+	 * @param grouponId
+	 *            团购活动ID
+	 * @return 操作结果
+	 */
+	@GetMapping("join")
+	public Object join(@NotNull Integer grouponId) {
+		logger.info("【请求开始】参加团购,请求参数,grouponId:{}", grouponId);
 
-        DtsGoods goods = goodsService.findById(rules.getGoodsId());
-        if (goods == null) {
-            return ResponseUtil.badArgumentValue();
-        }
+		DtsGroupon groupon = grouponService.queryById(grouponId);
+		if (groupon == null) {
+			return ResponseUtil.badArgumentValue();
+		}
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("groupon", groupon);
-        result.put("goods", goods);
+		DtsGrouponRules rules = rulesService.queryById(groupon.getRulesId());
+		if (rules == null) {
+			return ResponseUtil.badArgumentValue();
+		}
 
-        return ResponseUtil.ok(result);
-    }
+		DtsGoods goods = goodsService.findById(rules.getGoodsId());
+		if (goods == null) {
+			return ResponseUtil.badArgumentValue();
+		}
 
-    /**
-     * 用户开团或入团情况
-     *
-     * @param userId 用户ID
-     * @param showType 显示类型，如果是0，则是当前用户开的团购；否则，则是当前用户参加的团购
-     * @return 用户开团或入团情况
-     */
-    @GetMapping("my")
-    public Object my(@LoginUser Integer userId, @RequestParam(defaultValue = "0") Integer showType) {
-        if (userId == null) {
-            return ResponseUtil.unlogin();
-        }
+		Map<String, Object> result = new HashMap<>();
+		result.put("groupon", groupon);
+		result.put("goods", goods);
 
-        List<DtsGroupon> myGroupons;
-        if (showType == 0) {
-            myGroupons = grouponService.queryMyGroupon(userId);
-        } else {
-            myGroupons = grouponService.queryMyJoinGroupon(userId);
-        }
+		logger.info("【请求结束】参加团购,响应结果:{}", JSONObject.toJSONString(result));
+		return ResponseUtil.ok(result);
+	}
 
-        List<Map<String, Object>> grouponVoList = new ArrayList<>(myGroupons.size());
+	/**
+	 * 用户开团或入团情况
+	 *
+	 * @param userId
+	 *            用户ID
+	 * @param showType
+	 *            显示类型，如果是0，则是当前用户开的团购；否则，则是当前用户参加的团购
+	 * @return 用户开团或入团情况
+	 */
+	@GetMapping("my")
+	public Object my(@LoginUser Integer userId, @RequestParam(defaultValue = "0") Integer showType) {
+		logger.info("【请求开始】查询用户开团或入团情况,请求参数,userId:{},showType:{}", userId, showType);
 
-        DtsOrder order;
-        DtsGrouponRules rules;
-        DtsUser creator;
-        for (DtsGroupon groupon : myGroupons) {
-            order = orderService.findById(groupon.getOrderId());
-            rules = rulesService.queryById(groupon.getRulesId());
-            creator = userService.findById(groupon.getCreatorUserId());
+		if (userId == null) {
+			logger.error("查询用户开团或入团情况出错:用户未登录！！！");
+			return ResponseUtil.unlogin();
+		}
 
-            Map<String, Object> grouponVo = new HashMap<>();
-            //填充团购信息
-            grouponVo.put("id", groupon.getId());
-            grouponVo.put("groupon", groupon);
-            grouponVo.put("rules", rules);
-            grouponVo.put("creator", creator.getNickname());
+		List<DtsGroupon> myGroupons;
+		if (showType == 0) {
+			myGroupons = grouponService.queryMyGroupon(userId);
+		} else {
+			myGroupons = grouponService.queryMyJoinGroupon(userId);
+		}
 
-            int linkGrouponId;
-            // 这是一个团购发起记录
-            if (groupon.getGrouponId() == 0) {
-                linkGrouponId = groupon.getId();
-                grouponVo.put("isCreator", creator.getId() == userId);
-            } else {
-                linkGrouponId = groupon.getGrouponId();
-                grouponVo.put("isCreator", false);
-            }
-            int joinerCount = grouponService.countGroupon(linkGrouponId);
-            grouponVo.put("joinerCount", joinerCount + 1);
+		List<Map<String, Object>> grouponVoList = new ArrayList<>(myGroupons.size());
 
-            //填充订单信息
-            grouponVo.put("orderId", order.getId());
-            grouponVo.put("orderSn", order.getOrderSn());
-            grouponVo.put("actualPrice", order.getActualPrice());
-            grouponVo.put("orderStatusText", OrderUtil.orderStatusText(order));
-            grouponVo.put("handleOption", OrderUtil.build(order));
+		DtsOrder order;
+		DtsGrouponRules rules;
+		DtsUser creator;
+		for (DtsGroupon groupon : myGroupons) {
+			order = orderService.findById(groupon.getOrderId());
+			rules = rulesService.queryById(groupon.getRulesId());
+			creator = userService.findById(groupon.getCreatorUserId());
 
-            List<DtsOrderGoods> orderGoodsList = orderGoodsService.queryByOid(order.getId());
-            List<Map<String, Object>> orderGoodsVoList = new ArrayList<>(orderGoodsList.size());
-            for (DtsOrderGoods orderGoods : orderGoodsList) {
-                Map<String, Object> orderGoodsVo = new HashMap<>();
-                orderGoodsVo.put("id", orderGoods.getId());
-                orderGoodsVo.put("goodsName", orderGoods.getGoodsName());
-                orderGoodsVo.put("number", orderGoods.getNumber());
-                orderGoodsVo.put("picUrl", orderGoods.getPicUrl());
-                orderGoodsVoList.add(orderGoodsVo);
-            }
-            grouponVo.put("goodsList", orderGoodsVoList);
-            grouponVoList.add(grouponVo);
-        }
+			Map<String, Object> grouponVo = new HashMap<>();
+			// 填充团购信息
+			grouponVo.put("id", groupon.getId());
+			grouponVo.put("groupon", groupon);
+			grouponVo.put("rules", rules);
+			grouponVo.put("creator", creator.getNickname());
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("count", grouponVoList.size());
-        result.put("data", grouponVoList);
+			int linkGrouponId;
+			// 这是一个团购发起记录
+			if (groupon.getGrouponId() == 0) {
+				linkGrouponId = groupon.getId();
+				grouponVo.put("isCreator", creator.getId() == userId);
+			} else {
+				linkGrouponId = groupon.getGrouponId();
+				grouponVo.put("isCreator", false);
+			}
+			int joinerCount = grouponService.countGroupon(linkGrouponId);
+			grouponVo.put("joinerCount", joinerCount + 1);
 
-        return ResponseUtil.ok(result);
-    }
+			// 填充订单信息
+			grouponVo.put("orderId", order.getId());
+			grouponVo.put("orderSn", order.getOrderSn());
+			grouponVo.put("actualPrice", order.getActualPrice());
+			grouponVo.put("orderStatusText", OrderUtil.orderStatusText(order));
+			grouponVo.put("handleOption", OrderUtil.build(order));
 
-    /**
-     * 商品所对应的团购规则
-     *
-     * @param goodsId 商品ID
-     * @return 团购规则详情
-     */
-    @GetMapping("query")
-    public Object query(@NotNull Integer goodsId) {
-        DtsGoods goods = goodsService.findById(goodsId);
-        if (goods == null) {
-            return ResponseUtil.fail(GOODS_UNKNOWN, "未找到对应的商品");
-        }
+			List<DtsOrderGoods> orderGoodsList = orderGoodsService.queryByOid(order.getId());
+			List<Map<String, Object>> orderGoodsVoList = new ArrayList<>(orderGoodsList.size());
+			for (DtsOrderGoods orderGoods : orderGoodsList) {
+				Map<String, Object> orderGoodsVo = new HashMap<>();
+				orderGoodsVo.put("id", orderGoods.getId());
+				orderGoodsVo.put("goodsName", orderGoods.getGoodsName());
+				orderGoodsVo.put("number", orderGoods.getNumber());
+				orderGoodsVo.put("picUrl", orderGoods.getPicUrl());
+				orderGoodsVoList.add(orderGoodsVo);
+			}
+			grouponVo.put("goodsList", orderGoodsVoList);
+			grouponVoList.add(grouponVo);
+		}
 
-        List<DtsGrouponRules> rules = rulesService.queryByGoodsId(goodsId);
+		Map<String, Object> result = new HashMap<>();
+		result.put("count", grouponVoList.size());
+		result.put("data", grouponVoList);
 
-        return ResponseUtil.ok(rules);
-    }
+		logger.info("【请求结束】查询用户开团或入团情况,响应结果:{}", JSONObject.toJSONString(result));
+		return ResponseUtil.ok(result);
+	}
+
+	/**
+	 * 商品所对应的团购规则
+	 *
+	 * @param goodsId
+	 *            商品ID
+	 * @return 团购规则详情
+	 */
+	@GetMapping("query")
+	public Object query(@NotNull Integer goodsId) {
+		logger.info("【请求开始】商品所对应的团购规则,请求参数,goodsId:{}", goodsId);
+
+		DtsGoods goods = goodsService.findById(goodsId);
+		if (goods == null) {
+			logger.error("商品所对应的团购规则:{}", GOODS_UNKNOWN.desc());
+			return WxResponseUtil.fail(GOODS_UNKNOWN);
+		}
+
+		List<DtsGrouponRules> rules = rulesService.queryByGoodsId(goodsId);
+
+		logger.info("【请求结束】商品所对应的团购规则,响应结果:{}", JSONObject.toJSONString(rules));
+		return ResponseUtil.ok(rules);
+	}
 }

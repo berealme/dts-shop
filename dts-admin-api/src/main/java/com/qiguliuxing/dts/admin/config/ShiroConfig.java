@@ -20,55 +20,55 @@ import com.qiguliuxing.dts.admin.shiro.AdminWebSessionManager;
 @Configuration
 public class ShiroConfig {
 
-    @Bean
-    public Realm realm() {
-        return new AdminAuthorizingRealm();
-    }
+	@Bean
+	public Realm realm() {
+		return new AdminAuthorizingRealm();
+	}
 
-    @Bean
-    public ShiroFilterFactoryBean shirFilter(SecurityManager securityManager) {
-        ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
-        shiroFilterFactoryBean.setSecurityManager(securityManager);
-        Map<String, String> filterChainDefinitionMap = new LinkedHashMap<String, String>();
-        filterChainDefinitionMap.put("/admin/auth/login", "anon");
-        filterChainDefinitionMap.put("/admin/auth/401", "anon");
-        filterChainDefinitionMap.put("/admin/auth/index", "anon");
-        filterChainDefinitionMap.put("/admin/auth/403", "anon");
+	@Bean
+	public ShiroFilterFactoryBean shirFilter(SecurityManager securityManager) {
+		ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
+		shiroFilterFactoryBean.setSecurityManager(securityManager);
+		Map<String, String> filterChainDefinitionMap = new LinkedHashMap<String, String>();
+		filterChainDefinitionMap.put("/admin/auth/login", "anon");
+		filterChainDefinitionMap.put("/admin/auth/401", "anon");
+		filterChainDefinitionMap.put("/admin/auth/index", "anon");
+		filterChainDefinitionMap.put("/admin/auth/403", "anon");
 
-        filterChainDefinitionMap.put("/admin/**", "authc");
-        shiroFilterFactoryBean.setLoginUrl("/admin/auth/401");
-        shiroFilterFactoryBean.setSuccessUrl("/admin/auth/index");
-        shiroFilterFactoryBean.setUnauthorizedUrl("/admin/auth/403");
-        shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
-        return shiroFilterFactoryBean;
-    }
+		filterChainDefinitionMap.put("/admin/**", "authc");
+		shiroFilterFactoryBean.setLoginUrl("/admin/auth/401");
+		shiroFilterFactoryBean.setSuccessUrl("/admin/auth/index");
+		shiroFilterFactoryBean.setUnauthorizedUrl("/admin/auth/403");
+		shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
+		return shiroFilterFactoryBean;
+	}
 
-    @Bean
-    public SessionManager sessionManager() {
-        AdminWebSessionManager mySessionManager = new AdminWebSessionManager();
-        return mySessionManager;
-    }
+	@Bean
+	public SessionManager sessionManager() {
+		AdminWebSessionManager mySessionManager = new AdminWebSessionManager();
+		return mySessionManager;
+	}
 
-    @Bean
-    public DefaultWebSecurityManager securityManager() {
-        DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
-        securityManager.setRealm(realm());
-        securityManager.setSessionManager(sessionManager());
-        return securityManager;
-    }
+	@Bean
+	public DefaultWebSecurityManager securityManager() {
+		DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
+		securityManager.setRealm(realm());
+		securityManager.setSessionManager(sessionManager());
+		return securityManager;
+	}
 
-    @Bean
-    public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(SecurityManager securityManager) {
-        AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor = new AuthorizationAttributeSourceAdvisor();
-        authorizationAttributeSourceAdvisor.setSecurityManager(securityManager);
-        return authorizationAttributeSourceAdvisor;
-    }
+	@Bean
+	public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(SecurityManager securityManager) {
+		AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor = new AuthorizationAttributeSourceAdvisor();
+		authorizationAttributeSourceAdvisor.setSecurityManager(securityManager);
+		return authorizationAttributeSourceAdvisor;
+	}
 
-    @Bean
-    @DependsOn("lifecycleBeanPostProcessor")
-    public static DefaultAdvisorAutoProxyCreator defaultAdvisorAutoProxyCreator() {
-        DefaultAdvisorAutoProxyCreator creator = new DefaultAdvisorAutoProxyCreator();
-        creator.setProxyTargetClass(true);
-        return creator;
-    }
+	@Bean
+	@DependsOn("lifecycleBeanPostProcessor")
+	public static DefaultAdvisorAutoProxyCreator defaultAdvisorAutoProxyCreator() {
+		DefaultAdvisorAutoProxyCreator creator = new DefaultAdvisorAutoProxyCreator();
+		creator.setProxyTargetClass(true);
+		return creator;
+	}
 }

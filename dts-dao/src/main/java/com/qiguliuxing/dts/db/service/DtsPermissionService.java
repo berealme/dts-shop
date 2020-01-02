@@ -16,63 +16,62 @@ import com.qiguliuxing.dts.db.domain.DtsPermissionExample;
 
 @Service
 public class DtsPermissionService {
-    @Resource
-    private DtsPermissionMapper permissionMapper;
+	@Resource
+	private DtsPermissionMapper permissionMapper;
 
-    public Set<String> queryByRoleIds(Integer[] roleIds) {
-        Set<String> permissions = new HashSet<String>();
-        if(roleIds.length == 0){
-            return permissions;
-        }
+	public Set<String> queryByRoleIds(Integer[] roleIds) {
+		Set<String> permissions = new HashSet<String>();
+		if (roleIds.length == 0) {
+			return permissions;
+		}
 
-        DtsPermissionExample example = new DtsPermissionExample();
-        example.or().andRoleIdIn(Arrays.asList(roleIds)).andDeletedEqualTo(false);
-        List<DtsPermission> permissionList = permissionMapper.selectByExample(example);
+		DtsPermissionExample example = new DtsPermissionExample();
+		example.or().andRoleIdIn(Arrays.asList(roleIds)).andDeletedEqualTo(false);
+		List<DtsPermission> permissionList = permissionMapper.selectByExample(example);
 
-        for(DtsPermission permission : permissionList){
-            permissions.add(permission.getPermission());
-        }
+		for (DtsPermission permission : permissionList) {
+			permissions.add(permission.getPermission());
+		}
 
-        return permissions;
-    }
+		return permissions;
+	}
 
+	public Set<String> queryByRoleId(Integer roleId) {
+		Set<String> permissions = new HashSet<String>();
+		if (roleId == null) {
+			return permissions;
+		}
 
-    public Set<String> queryByRoleId(Integer roleId) {
-        Set<String> permissions = new HashSet<String>();
-        if(roleId == null){
-            return permissions;
-        }
+		DtsPermissionExample example = new DtsPermissionExample();
+		example.or().andRoleIdEqualTo(roleId).andDeletedEqualTo(false);
+		List<DtsPermission> permissionList = permissionMapper.selectByExample(example);
 
-        DtsPermissionExample example = new DtsPermissionExample();
-        example.or().andRoleIdEqualTo(roleId).andDeletedEqualTo(false);
-        List<DtsPermission> permissionList = permissionMapper.selectByExample(example);
+		for (DtsPermission permission : permissionList) {
+			permissions.add(permission.getPermission());
+		}
 
-        for(DtsPermission permission : permissionList){
-            permissions.add(permission.getPermission());
-        }
+		return permissions;
+	}
 
-        return permissions;
-    }
+	public boolean checkSuperPermission(Integer roleId) {
+		if (roleId == null) {
+			return false;
+		}
 
-    public boolean checkSuperPermission(Integer roleId) {
-        if(roleId == null){
-            return false;
-        }
+		DtsPermissionExample example = new DtsPermissionExample();
+		example.or().andRoleIdEqualTo(roleId).andPermissionEqualTo("*").andDeletedEqualTo(false);
+		return permissionMapper.countByExample(example) != 0;
+	}
 
-        DtsPermissionExample example = new DtsPermissionExample();
-        example.or().andRoleIdEqualTo(roleId).andPermissionEqualTo("*").andDeletedEqualTo(false);
-        return permissionMapper.countByExample(example) != 0;
-    }
+	public void deleteByRoleId(Integer roleId) {
+		DtsPermissionExample example = new DtsPermissionExample();
+		example.or().andRoleIdEqualTo(roleId).andDeletedEqualTo(false);
+		permissionMapper.logicalDeleteByExample(example);
+	}
 
-    public void deleteByRoleId(Integer roleId) {
-        DtsPermissionExample example = new DtsPermissionExample();
-        example.or().andRoleIdEqualTo(roleId).andDeletedEqualTo(false);
-        permissionMapper.logicalDeleteByExample(example);
-    }
-
-    public void add(DtsPermission DtsPermission) {
-        DtsPermission.setAddTime(LocalDateTime.now());
-        DtsPermission.setUpdateTime(LocalDateTime.now());
-        permissionMapper.insertSelective(DtsPermission);
-    }
+	public void add(DtsPermission DtsPermission) {
+		DtsPermission.setAddTime(LocalDateTime.now());
+		DtsPermission.setUpdateTime(LocalDateTime.now());
+		permissionMapper.insertSelective(DtsPermission);
+	}
 }

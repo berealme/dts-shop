@@ -45,7 +45,6 @@ public class DtsAccountService {
 
 	@Resource
 	private DtsUserMapper userMapper;
-	
 
 	public DtsUserAccount findShareUserAccountByUserId(Integer shareUserId) {
 
@@ -159,7 +158,7 @@ public class DtsAccountService {
 
 		Long orderCnt = accountMapperEx.countOrderSharedUser(sharedUserId, startTime);
 		BigDecimal orderSettleAmt = accountMapperEx.sumOrderSettleAmtSharedUser(sharedUserId, startTime);
-		if(orderSettleAmt == null) {
+		if (orderSettleAmt == null) {
 			orderSettleAmt = new BigDecimal(0.00);
 		}
 		BigDecimal finalSettleAmt = orderSettleAmt; // 默认就是设置的结算价格
@@ -172,53 +171,54 @@ public class DtsAccountService {
 
 	public List<DtsOrder> querySettlementOrder(Integer sharedUserId, List<Short> orderStatus,
 			List<Short> settlementStatus, Integer page, Integer size) {
-		
-        String conditionSql = null;
-        if (orderStatus != null) {
-        	conditionSql = "";
-        	for(Short orderStatu: orderStatus) {
-        		conditionSql += ","+orderStatu;
-        	}
-           conditionSql = "and o.order_status in ("+ conditionSql.substring(1) +") ";
-        }
-        if(settlementStatus != null && settlementStatus.size() == 1) {
-        	conditionSql = conditionSql + " and o.settlement_status ="+settlementStatus.get(0)+" ";
-        }
-       
-        PageHelper.startPage(page, size);
-        return accountMapperEx.querySettlementOrder(sharedUserId,conditionSql);
-    }
+
+		String conditionSql = null;
+		if (orderStatus != null) {
+			conditionSql = "";
+			for (Short orderStatu : orderStatus) {
+				conditionSql += "," + orderStatu;
+			}
+			conditionSql = "and o.order_status in (" + conditionSql.substring(1) + ") ";
+		}
+		if (settlementStatus != null && settlementStatus.size() == 1) {
+			conditionSql = conditionSql + " and o.settlement_status =" + settlementStatus.get(0) + " ";
+		}
+
+		PageHelper.startPage(page, size);
+		return accountMapperEx.querySettlementOrder(sharedUserId, conditionSql);
+	}
 
 	public List<DtsAccountTrace> queryAccountTraceList(Integer userId, Integer page, Integer size) {
 		DtsAccountTraceExample example = new DtsAccountTraceExample();
-	    example.setOrderByClause(DtsAccountTrace.Column.traceTime.desc());
-	    DtsAccountTraceExample.Criteria criteria = example.or();
-	    criteria.andUserIdEqualTo(userId);
-	    PageHelper.startPage(page, size);
-        return accountTraceMapper.selectByExample(example);
+		example.setOrderByClause(DtsAccountTrace.Column.traceTime.desc());
+		DtsAccountTraceExample.Criteria criteria = example.or();
+		criteria.andUserIdEqualTo(userId);
+		PageHelper.startPage(page, size);
+		return accountTraceMapper.selectByExample(example);
 	}
 
-	
 	/**
-	  * 新增申请提现记录
+	 * 新增申请提现记录
+	 * 
 	 * @param userId
 	 * @param applyAmt
 	 */
-	public void addExtractRecord(Integer userId, BigDecimal applyAmt,String mobile,String smsCode,BigDecimal remainAmount) {
-		
+	public void addExtractRecord(Integer userId, BigDecimal applyAmt, String mobile, String smsCode,
+			BigDecimal remainAmount) {
+
 		DtsAccountTrace record = new DtsAccountTrace();
 		record.setAmount(applyAmt);
 		record.setMobile(mobile);
 		record.setRemainAmount(remainAmount);
 		record.setSmsCode(smsCode);
-		
+
 		DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyyMMdd");
-	    String now = df.format(LocalDate.now());
-	    String traceSn = now + getRandomNum(6);
+		String now = df.format(LocalDate.now());
+		String traceSn = now + getRandomNum(6);
 		record.setTraceSn(traceSn);
-		
+
 		record.setTraceTime(LocalDateTime.now());
-		record.setType(1);//申请中..
+		record.setType(1);// 申请中..
 		record.setUserId(userId);
 		accountTraceMapper.insert(record);
 	}

@@ -20,8 +20,8 @@ public class SettlementJob {
 	private final Log logger = LogFactory.getLog(SettlementJob.class);
 
 	@Autowired
-    private DtsAccountService accountService;
-	
+	private DtsAccountService accountService;
+
 	/**
 	 * 自动结算代理佣金
 	 * <p>
@@ -32,13 +32,13 @@ public class SettlementJob {
 	@Scheduled(cron = "0 30 1 10 * ?")
 	public void checkOrderUnconfirm() {
 		List<Integer> sharedUserIds = accountService.findAllSharedUserId();
-		logger.info("自动结算代理佣金定时任务,共找到  "+ sharedUserIds.size() +" 位代理用户,开始统计佣金...");
-		
-		for(Integer sharedUserId:sharedUserIds) {
+		logger.info("自动结算代理佣金定时任务,共找到  " + sharedUserIds.size() + " 位代理用户,开始统计佣金...");
+
+		for (Integer sharedUserId : sharedUserIds) {
 			try {
-				accountService.setSettleMentAccount(sharedUserId,DateTimeUtil.getPrevMonthEndDay());
+				accountService.setSettleMentAccount(sharedUserId, DateTimeUtil.getPrevMonthEndDay());
 			} catch (Exception e) {
-				logger.error("自动结算出错:"+e.getMessage());
+				logger.error("自动结算出错:" + e.getMessage());
 				e.printStackTrace();
 			}
 		}

@@ -8,6 +8,7 @@ import com.qiguliuxing.dts.db.domain.DtsOrderGoods;
 
 /**
  * 用于拆单时存储临时的订单商品
+ * 
  * @author CHENBO
  * @QQ 623659388
  * @since 1.0.0
@@ -15,13 +16,13 @@ import com.qiguliuxing.dts.db.domain.DtsOrderGoods;
 public class BrandOrderGoods implements Serializable {
 
 	private static final long serialVersionUID = 4756437344642762485L;
-	
-	private Integer brandId; 
-	
+
+	private Integer brandId;
+
 	private List<DtsOrderGoods> orderGoodsList;
-	
-    private BigDecimal bandGoodsTotalPrice;
-	
+
+	private BigDecimal bandGoodsTotalPrice;
+
 	private BigDecimal bandFreightPrice;
 
 	public Integer getBrandId() {
@@ -55,7 +56,5 @@ public class BrandOrderGoods implements Serializable {
 	public void setBandFreightPrice(BigDecimal bandFreightPrice) {
 		this.bandFreightPrice = bandFreightPrice;
 	}
-	
-	
-      
+
 }

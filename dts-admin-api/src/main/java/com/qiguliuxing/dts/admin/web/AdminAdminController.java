@@ -10,9 +10,9 @@ import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
@@ -23,8 +23,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.qiguliuxing.dts.admin.annotation.RequiresPermissionsDesc;
+import com.qiguliuxing.dts.admin.util.AdminResponseUtil;
 import com.qiguliuxing.dts.core.util.RegexUtil;
 import com.qiguliuxing.dts.core.util.ResponseUtil;
 import com.qiguliuxing.dts.core.util.bcrypt.BCryptPasswordEncoder;
@@ -37,113 +39,131 @@ import com.qiguliuxing.dts.db.service.DtsAdminService;
 @RequestMapping("/admin/admin")
 @Validated
 public class AdminAdminController {
-    private final Log logger = LogFactory.getLog(AdminAdminController.class);
+	private static final Logger logger = LoggerFactory.getLogger(AdminAdminController.class);
 
-    @Autowired
-    private DtsAdminService adminService;
+	@Autowired
+	private DtsAdminService adminService;
 
-    @RequiresPermissions("admin:admin:list")
-    @RequiresPermissionsDesc(menu={"系统管理" , "管理员管理"}, button="查询")
-    @GetMapping("/list")
-    public Object list(String username,
-                       @RequestParam(defaultValue = "1") Integer page,
-                       @RequestParam(defaultValue = "10") Integer limit,
-                       @Sort @RequestParam(defaultValue = "add_time") String sort,
-                       @Order @RequestParam(defaultValue = "desc") String order) {
-        List<DtsAdmin> adminList = adminService.querySelective(username, page, limit, sort, order);
-        long total = PageInfo.of(adminList).getTotal();
-        Map<String, Object> data = new HashMap<>();
-        data.put("total", total);
-        data.put("items", adminList);
+	@RequiresPermissions("admin:admin:list")
+	@RequiresPermissionsDesc(menu = { "系统管理", "管理员管理" }, button = "查询")
+	@GetMapping("/list")
+	public Object list(String username, @RequestParam(defaultValue = "1") Integer page,
+			@RequestParam(defaultValue = "10") Integer limit,
+			@Sort @RequestParam(defaultValue = "add_time") String sort,
+			@Order @RequestParam(defaultValue = "desc") String order) {
+		logger.info("【请求开始】系统管理->管理员管理->查询,请求参数:username:{},page:{}", username, page);
 
-        return ResponseUtil.ok(data);
-    }
+		List<DtsAdmin> adminList = adminService.querySelective(username, page, limit, sort, order);
+		long total = PageInfo.of(adminList).getTotal();
+		Map<String, Object> data = new HashMap<>();
+		data.put("total", total);
+		data.put("items", adminList);
 
-    private Object validate(DtsAdmin admin) {
-        String name = admin.getUsername();
-        if (StringUtils.isEmpty(name)) {
-            return ResponseUtil.badArgument();
-        }
-        if (!RegexUtil.isUsername(name)) {
-        	logger.error("管理员名称不符合规定");
-            return ResponseUtil.fail(ADMIN_INVALID_NAME, "管理员名称不符合规定");
-        }
-        String password = admin.getPassword();
-        if (StringUtils.isEmpty(password) || password.length() < 6) {
-        	logger.error("管理员密码长度不能小于6");
-            return ResponseUtil.fail(ADMIN_INVALID_PASSWORD, "管理员密码长度不能小于6");
-        }
-        return null;
-    }
+		logger.info("【请求结束】系统管理->管理员管理->查询,响应结果:{}", JSONObject.toJSONString(data));
+		return ResponseUtil.ok(data);
+	}
 
-    @RequiresPermissions("admin:admin:create")
-    @RequiresPermissionsDesc(menu={"系统管理" , "管理员管理"}, button="添加")
-    @PostMapping("/create")
-    public Object create(@RequestBody DtsAdmin admin) {
-        Object error = validate(admin);
-        if (error != null) {
-            return error;
-        }
+	private Object validate(DtsAdmin admin) {
+		String name = admin.getUsername();
+		if (StringUtils.isEmpty(name)) {
+			return ResponseUtil.badArgument();
+		}
+		if (!RegexUtil.isUsername(name)) {
+			logger.error("校验错误：{}", ADMIN_INVALID_NAME.desc());
+			return AdminResponseUtil.fail(ADMIN_INVALID_NAME);
+		}
+		String password = admin.getPassword();
+		if (StringUtils.isEmpty(password) || password.length() < 6) {
+			logger.error("校验错误：{}", ADMIN_INVALID_PASSWORD.desc());
+			return AdminResponseUtil.fail(ADMIN_INVALID_PASSWORD);
+		}
+		return null;
+	}
 
-        String username = admin.getUsername();
-        List<DtsAdmin> adminList = adminService.findAdmin(username);
-        if (adminList.size() > 0) {
-        	logger.error("管理员已经存在");
-            return ResponseUtil.fail(ADMIN_NAME_EXIST, "管理员已经存在");
-        }
+	@RequiresPermissions("admin:admin:create")
+	@RequiresPermissionsDesc(menu = { "系统管理", "管理员管理" }, button = "添加")
+	@PostMapping("/create")
+	public Object create(@RequestBody DtsAdmin admin) {
+		logger.info("【请求开始】系统管理->管理员管理->添加,请求参数:{}", JSONObject.toJSONString(admin));
 
-        String rawPassword = admin.getPassword();
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        String encodedPassword = encoder.encode(rawPassword);
-        admin.setPassword(encodedPassword);
-        adminService.add(admin);
-        return ResponseUtil.ok(admin);
-    }
+		Object error = validate(admin);
+		if (error != null) {
+			return error;
+		}
 
-    @RequiresPermissions("admin:admin:read")
-    @RequiresPermissionsDesc(menu={"系统管理" , "管理员管理"}, button="详情")
-    @GetMapping("/read")
-    public Object read(@NotNull Integer id) {
-        DtsAdmin admin = adminService.findById(id);
-        return ResponseUtil.ok(admin);
-    }
+		String username = admin.getUsername();
+		List<DtsAdmin> adminList = adminService.findAdmin(username);
+		if (adminList.size() > 0) {
+			logger.error("系统管理->管理员管理->添加 ,错误：{}", ADMIN_NAME_EXIST.desc());
+			return AdminResponseUtil.fail(ADMIN_NAME_EXIST);
+		}
 
-    @RequiresPermissions("admin:admin:update")
-    @RequiresPermissionsDesc(menu={"系统管理" , "管理员管理"}, button="编辑")
-    @PostMapping("/update")
-    public Object update(@RequestBody DtsAdmin admin) {
-        Object error = validate(admin);
-        if (error != null) {
-            return error;
-        }
+		String rawPassword = admin.getPassword();
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		String encodedPassword = encoder.encode(rawPassword);
+		admin.setPassword(encodedPassword);
+		adminService.add(admin);
 
-        Integer anotherAdminId = admin.getId();
-        if (anotherAdminId == null) {
-            return ResponseUtil.badArgument();
-        }
+		logger.info("【请求结束】系统管理->管理员管理->添加,响应结果:{}", JSONObject.toJSONString(admin));
+		return ResponseUtil.ok(admin);
+	}
 
-        String rawPassword = admin.getPassword();
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        String encodedPassword = encoder.encode(rawPassword);
-        admin.setPassword(encodedPassword);
+	@RequiresPermissions("admin:admin:read")
+	@RequiresPermissionsDesc(menu = { "系统管理", "管理员管理" }, button = "详情")
+	@GetMapping("/read")
+	public Object read(@NotNull Integer id) {
+		logger.info("【请求开始】系统管理->管理员管理->详情,请求参数,id:{}", id);
 
-        if (adminService.updateById(admin) == 0) {
-            return ResponseUtil.updatedDataFailed();
-        }
+		DtsAdmin admin = adminService.findById(id);
 
-        return ResponseUtil.ok(admin);
-    }
+		logger.info("【请求结束】系统管理->管理员管理->详情,响应结果:{}", JSONObject.toJSONString(admin));
+		return ResponseUtil.ok(admin);
+	}
 
-    @RequiresPermissions("admin:admin:delete")
-    @RequiresPermissionsDesc(menu={"系统管理" , "管理员管理"}, button="删除")
-    @PostMapping("/delete")
-    public Object delete(@RequestBody DtsAdmin admin) {
-        Integer anotherAdminId = admin.getId();
-        if (anotherAdminId == null) {
-            return ResponseUtil.badArgument();
-        }
+	@RequiresPermissions("admin:admin:update")
+	@RequiresPermissionsDesc(menu = { "系统管理", "管理员管理" }, button = "编辑")
+	@PostMapping("/update")
+	public Object update(@RequestBody DtsAdmin admin) {
+		logger.info("【请求开始】系统管理->管理员管理->编辑,请求参数:{}", JSONObject.toJSONString(admin));
 
-        adminService.deleteById(anotherAdminId);
-        return ResponseUtil.ok();
-    }
+		Object error = validate(admin);
+		if (error != null) {
+			return error;
+		}
+
+		Integer anotherAdminId = admin.getId();
+		if (anotherAdminId == null) {
+			return ResponseUtil.badArgument();
+		}
+
+		String rawPassword = admin.getPassword();
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		String encodedPassword = encoder.encode(rawPassword);
+		admin.setPassword(encodedPassword);
+
+		if (adminService.updateById(admin) == 0) {
+			logger.error("系统管理->管理员管理-编辑 ,错误：{}", "更新数据失败！");
+			return ResponseUtil.updatedDataFailed();
+		}
+
+		logger.info("【请求结束】系统管理->管理员管理->编辑,响应结果:{}", JSONObject.toJSONString(admin));
+		return ResponseUtil.ok(admin);
+	}
+
+	@RequiresPermissions("admin:admin:delete")
+	@RequiresPermissionsDesc(menu = { "系统管理", "管理员管理" }, button = "删除")
+	@PostMapping("/delete")
+	public Object delete(@RequestBody DtsAdmin admin) {
+		logger.info("【请求开始】系统管理->管理员管理->删除,请求参数:{}", JSONObject.toJSONString(admin));
+
+		Integer anotherAdminId = admin.getId();
+		if (anotherAdminId == null) {
+			return ResponseUtil.badArgument();
+		}
+
+		adminService.deleteById(anotherAdminId);
+
+		logger.info("【请求结束】系统管理->管理员管理->删除 成功！");
+		return ResponseUtil.ok();
+	}
 }

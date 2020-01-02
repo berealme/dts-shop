@@ -1,22 +1,55 @@
 package com.qiguliuxing.dts.admin.util;
 
-public class AdminResponseCode {
-    public static final Integer ADMIN_INVALID_NAME = 601;
-    public static final Integer ADMIN_INVALID_PASSWORD = 602;
-    public static final Integer ADMIN_NAME_EXIST = 602;
-    public static final Integer ADMIN_ALTER_NOT_ALLOWED = 603;
-    public static final Integer ADMIN_DELETE_NOT_ALLOWED = 604;
-    public static final Integer ADMIN_INVALID_ACCOUNT = 605;
-    public static final Integer GOODS_UPDATE_NOT_ALLOWED = 610;
-    public static final Integer GOODS_NAME_EXIST = 611;
-    public static final Integer ORDER_CONFIRM_NOT_ALLOWED = 620;
-    public static final Integer ORDER_REFUND_FAILED = 621;
-    public static final Integer ORDER_REPLY_EXIST = 622;
-    public static final Integer USER_INVALID_NAME = 630;
-    public static final Integer USER_INVALID_PASSWORD = 631;
-    public static final Integer USER_INVALID_MOBILE = 632;
-    public static final Integer USER_NAME_EXIST = 633;
-    public static final Integer USER_MOBILE_EXIST = 634;
-    public static final Integer ROLE_NAME_EXIST = 640;
-    public static final Integer ROLE_SUPER_SUPERMISSION = 641;
+/**
+ * 返回码定义
+ * 
+ * @author CHENBO
+ * @since 1.0.0
+ * @QQ 623659388
+ * 
+ */
+public enum AdminResponseCode {
+
+	ADMIN_INVALID_NAME(600, "管理员名称不符合规定"), ADMIN_INVALID_PASSWORD(601, "管理员密码长度不能小于6"),
+	ADMIN_NAME_EXIST(602, "管理员已经存在"),
+	// ADMIN_ALTER_NOT_ALLOWED(603,""),
+	// ADMIN_DELETE_NOT_ALLOWED(604,""),
+	ADMIN_INVALID_ACCOUNT_OR_PASSWORD(605, "用户帐号或密码不正确"), ADMIN_LOCK_ACCOUNT(606, "用户帐号已锁定不可用"),
+	ADMIN_INVALID_AUTH(607, "认证失败"), GOODS_UPDATE_NOT_ALLOWED(610, "商品已经在订单或购物车中，不能修改"),
+	GOODS_NAME_EXIST(611, "商品名已经存在"), ORDER_CONFIRM_NOT_ALLOWED(620, "当前订单状态不能确认收货"),
+	ORDER_REFUND_FAILED(621, "当前订单状态不能退款"), ORDER_REPLY_EXIST(622, "订单商品已回复！"),
+	ADMIN_INVALID_OLD_PASSWORD(623, "原始密码不正确！"),
+	// USER_INVALID_NAME(630,""),
+	// USER_INVALID_PASSWORD(631,""),
+	// USER_INVALID_MOBILE(632,""),
+	// USER_NAME_EXIST(633,""),
+	// USER_MOBILE_EXIST(634,""),
+	ROLE_NAME_EXIST(640, "角色已经存在"), ROLE_SUPER_SUPERMISSION(641, "当前角色的超级权限不能变更");
+
+	private final Integer code;
+	private final String desc;
+
+	AdminResponseCode(Integer code, String desc) {
+		this.code = code;
+		this.desc = desc;
+	}
+
+	public static AdminResponseCode getInstance(Integer code) {
+		if (code != null) {
+			for (AdminResponseCode tmp : AdminResponseCode.values()) {
+				if (tmp.code.intValue() == code.intValue()) {
+					return tmp;
+				}
+			}
+		}
+		return null;
+	}
+
+	public Integer code() {
+		return code;
+	}
+
+	public String desc() {
+		return desc;
+	}
 }

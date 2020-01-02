@@ -16,92 +16,83 @@ import com.qiguliuxing.dts.db.domain.DtsGoodsSpecificationExample;
 
 @Service
 public class DtsGoodsSpecificationService {
-    @Resource
-    private DtsGoodsSpecificationMapper goodsSpecificationMapper;
+	@Resource
+	private DtsGoodsSpecificationMapper goodsSpecificationMapper;
 
-    public List<DtsGoodsSpecification> queryByGid(Integer id) {
-        DtsGoodsSpecificationExample example = new DtsGoodsSpecificationExample();
-        example.or().andGoodsIdEqualTo(id).andDeletedEqualTo(false);
-        return goodsSpecificationMapper.selectByExample(example);
-    }
+	public List<DtsGoodsSpecification> queryByGid(Integer id) {
+		DtsGoodsSpecificationExample example = new DtsGoodsSpecificationExample();
+		example.or().andGoodsIdEqualTo(id).andDeletedEqualTo(false);
+		return goodsSpecificationMapper.selectByExample(example);
+	}
 
-    public DtsGoodsSpecification findById(Integer id) {
-        return goodsSpecificationMapper.selectByPrimaryKey(id);
-    }
+	public DtsGoodsSpecification findById(Integer id) {
+		return goodsSpecificationMapper.selectByPrimaryKey(id);
+	}
 
-    public void deleteByGid(Integer gid) {
-        DtsGoodsSpecificationExample example = new DtsGoodsSpecificationExample();
-        example.or().andGoodsIdEqualTo(gid);
-        goodsSpecificationMapper.logicalDeleteByExample(example);
-    }
+	public void deleteByGid(Integer gid) {
+		DtsGoodsSpecificationExample example = new DtsGoodsSpecificationExample();
+		example.or().andGoodsIdEqualTo(gid);
+		goodsSpecificationMapper.logicalDeleteByExample(example);
+	}
 
-    public void add(DtsGoodsSpecification goodsSpecification) {
-        goodsSpecification.setAddTime(LocalDateTime.now());
-        goodsSpecification.setUpdateTime(LocalDateTime.now());
-        goodsSpecificationMapper.insertSelective(goodsSpecification);
-    }
+	public void add(DtsGoodsSpecification goodsSpecification) {
+		goodsSpecification.setAddTime(LocalDateTime.now());
+		goodsSpecification.setUpdateTime(LocalDateTime.now());
+		goodsSpecificationMapper.insertSelective(goodsSpecification);
+	}
 
-    /**
-     * [
-     * {
-     * name: '',
-     * valueList: [ {}, {}]
-     * },
-     * {
-     * name: '',
-     * valueList: [ {}, {}]
-     * }
-     * ]
-     *
-     * @param id
-     * @return
-     */
-    public Object getSpecificationVoList(Integer id) {
-        List<DtsGoodsSpecification> goodsSpecificationList = queryByGid(id);
+	/**
+	 * [ { name: '', valueList: [ {}, {}] }, { name: '', valueList: [ {}, {}] } ]
+	 *
+	 * @param id
+	 * @return
+	 */
+	public Object getSpecificationVoList(Integer id) {
+		List<DtsGoodsSpecification> goodsSpecificationList = queryByGid(id);
 
-        Map<String, VO> map = new HashMap<>();
-        List<VO> specificationVoList = new ArrayList<>();
+		Map<String, VO> map = new HashMap<>();
+		List<VO> specificationVoList = new ArrayList<>();
 
-        for (DtsGoodsSpecification goodsSpecification : goodsSpecificationList) {
-            String specification = goodsSpecification.getSpecification();
-            VO goodsSpecificationVo = map.get(specification);
-            if (goodsSpecificationVo == null) {
-                goodsSpecificationVo = new VO();
-                goodsSpecificationVo.setName(specification);
-                List<DtsGoodsSpecification> valueList = new ArrayList<>();
-                valueList.add(goodsSpecification);
-                goodsSpecificationVo.setValueList(valueList);
-                map.put(specification, goodsSpecificationVo);
-                specificationVoList.add(goodsSpecificationVo);
-            } else {
-                List<DtsGoodsSpecification> valueList = goodsSpecificationVo.getValueList();
-                valueList.add(goodsSpecification);
-            }
-        }
+		for (DtsGoodsSpecification goodsSpecification : goodsSpecificationList) {
+			String specification = goodsSpecification.getSpecification();
+			VO goodsSpecificationVo = map.get(specification);
+			if (goodsSpecificationVo == null) {
+				goodsSpecificationVo = new VO();
+				goodsSpecificationVo.setName(specification);
+				List<DtsGoodsSpecification> valueList = new ArrayList<>();
+				valueList.add(goodsSpecification);
+				goodsSpecificationVo.setValueList(valueList);
+				map.put(specification, goodsSpecificationVo);
+				specificationVoList.add(goodsSpecificationVo);
+			} else {
+				List<DtsGoodsSpecification> valueList = goodsSpecificationVo.getValueList();
+				valueList.add(goodsSpecification);
+			}
+		}
 
-        return specificationVoList;
-    }
+		return specificationVoList;
+	}
 
-    private class VO {
-        private String name;
-        private List<DtsGoodsSpecification> valueList;
+	private class VO {
+		private String name;
+		private List<DtsGoodsSpecification> valueList;
 
-        @SuppressWarnings("unused")
+		@SuppressWarnings("unused")
 		public String getName() {
-            return name;
-        }
+			return name;
+		}
 
-        public void setName(String name) {
-            this.name = name;
-        }
+		public void setName(String name) {
+			this.name = name;
+		}
 
-        public List<DtsGoodsSpecification> getValueList() {
-            return valueList;
-        }
+		public List<DtsGoodsSpecification> getValueList() {
+			return valueList;
+		}
 
-        public void setValueList(List<DtsGoodsSpecification> valueList) {
-            this.valueList = valueList;
-        }
-    }
+		public void setValueList(List<DtsGoodsSpecification> valueList) {
+			this.valueList = valueList;
+		}
+	}
 
 }

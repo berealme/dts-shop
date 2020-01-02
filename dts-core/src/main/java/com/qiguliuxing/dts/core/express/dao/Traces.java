@@ -13,25 +13,25 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class Traces {
 
-    @JsonProperty("AcceptStation")
-    private String acceptStation;
-    @JsonProperty("AcceptTime")
-    private String acceptTime;
+	@JsonProperty("AcceptStation")
+	private String acceptStation;
+	@JsonProperty("AcceptTime")
+	private String acceptTime;
 
-    public String getAcceptStation() {
-        return acceptStation;
-    }
+	public String getAcceptStation() {
+		return acceptStation;
+	}
 
-    public void setAcceptStation(String acceptStation) {
-        this.acceptStation = acceptStation;
-    }
+	public void setAcceptStation(String acceptStation) {
+		this.acceptStation = acceptStation;
+	}
 
-    public String getAcceptTime() {
-        return acceptTime;
-    }
+	public String getAcceptTime() {
+		return acceptTime;
+	}
 
-    public void setAcceptTime(String acceptTime) {
-        this.acceptTime = acceptTime;
-    }
+	public void setAcceptTime(String acceptTime) {
+		this.acceptTime = acceptTime;
+	}
 
 }

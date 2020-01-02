@@ -244,29 +244,33 @@ public class OrderUtil {
 		}
 		return settlementStatus;
 	}
-	
+
 	public static String orderHtmlText(DtsOrder order, String orderIds, List<DtsOrderGoods> orderGoodsList) {
 		String orderStr = "";
-		if (orderGoodsList == null || orderGoodsList.size() < 1) {//无商品时，设置商品信息为null
+		if (orderGoodsList == null || orderGoodsList.size() < 1) {// 无商品时，设置商品信息为null
 			orderStr = null;
 		} else {
 			for (DtsOrderGoods dog : orderGoodsList) {
-				orderStr = orderStr + "<br>&nbsp;&nbsp;&nbsp;&nbsp;"+"【"+ dog.getGoodsSn() +"】:"+ dog.getGoodsName();
+				orderStr = orderStr 
+						+ "<br>&nbsp;&nbsp;&nbsp;&nbsp;商品序列码" + "【" + dog.getGoodsSn() + "】;"
+						+ "<br>&nbsp;&nbsp;&nbsp;&nbsp;商品名称" + "【" + dog.getGoodsName() + "】;"
+						+ "<br>&nbsp;&nbsp;&nbsp;&nbsp;商品规格" + "【" + dog.getSpecifications() + "】;"
+						+ "<br>&nbsp;&nbsp;&nbsp;&nbsp;商品规格数量" + "【" + dog.getNumber() + "】<br>";
 			}
 		}
-		
-        StringBuilder sb = new StringBuilder();
-        sb.append("<br>订单编号：").append(order.getOrderSn());
-        sb.append("<br>订单id:").append(orderIds);
-        if (orderStr != null) {
-        	sb.append("<br>订购商品：").append(orderStr);
-        }
-        sb.append("<br>订单状态：").append(order.getOrderStatus());
-        sb.append("<br>收货人：").append(order.getConsignee());
-        sb.append("<br>收货人手机号：").append(order.getMobile());
-        sb.append("<br>收货地址：").append(order.getAddress());
-        sb.append("<br>用户订单留言：").append(order.getMessage());
-        sb.append("<br>微信付款时间：").append(order.getPayTime());
-        return sb.toString();
-    }
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("<br>订单编号：").append(order.getOrderSn());
+		sb.append("<br>订单ID:").append(orderIds);
+		if (orderStr != null) {
+			sb.append("<br>订购商品：").append(orderStr);
+		}
+		sb.append("<br>订单状态：").append(orderStatusText(order));
+		sb.append("<br>收货人：").append(order.getConsignee());
+		sb.append("<br>收货人手机号：").append(order.getMobile());
+		sb.append("<br>收货地址：").append(order.getAddress());
+		sb.append("<br>用户订单留言：").append(order.getMessage());
+		sb.append("<br>微信付款时间：").append(order.getPayTime());
+		return sb.toString();
+	}
 }

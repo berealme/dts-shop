@@ -20,31 +20,31 @@ import com.qiguliuxing.dts.db.util.CouponUserConstant;
  */
 @Component
 public class CouponJob {
-    private final Log logger = LogFactory.getLog(CouponJob.class);
+	private final Log logger = LogFactory.getLog(CouponJob.class);
 
-    @Autowired
-    private DtsCouponService couponService;
-    @Autowired
-    private DtsCouponUserService couponUserService;
+	@Autowired
+	private DtsCouponService couponService;
+	@Autowired
+	private DtsCouponUserService couponUserService;
 
-    /**
-     * 每隔一个小时检查
-     */
-    @Scheduled(fixedDelay = 60 * 60 * 1000)
-    public void checkCouponExpired() {
-        logger.info("系统开启任务检查优惠券是否已经过期");
+	/**
+	 * 每隔一个小时检查
+	 */
+	@Scheduled(fixedDelay = 60 * 60 * 1000)
+	public void checkCouponExpired() {
+		logger.info("系统开启任务检查优惠券是否已经过期");
 
-        List<DtsCoupon> couponList = couponService.queryExpired();
-        for(DtsCoupon coupon : couponList){
-            coupon.setStatus(CouponConstant.STATUS_EXPIRED);
-            couponService.updateById(coupon);
-        }
+		List<DtsCoupon> couponList = couponService.queryExpired();
+		for (DtsCoupon coupon : couponList) {
+			coupon.setStatus(CouponConstant.STATUS_EXPIRED);
+			couponService.updateById(coupon);
+		}
 
-        List<DtsCouponUser> couponUserList = couponUserService.queryExpired();
-        for(DtsCouponUser couponUser : couponUserList){
-            couponUser.setStatus(CouponUserConstant.STATUS_EXPIRED);
-            couponUserService.update(couponUser);
-        }
-    }
+		List<DtsCouponUser> couponUserList = couponUserService.queryExpired();
+		for (DtsCouponUser couponUser : couponUserList) {
+			couponUser.setStatus(CouponUserConstant.STATUS_EXPIRED);
+			couponUserService.update(couponUser);
+		}
+	}
 
 }

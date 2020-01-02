@@ -3,14 +3,14 @@ package com.qiguliuxing.dts.admin.dao;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class AccountVo implements Serializable{
+public class AccountVo implements Serializable {
 
 	private static final long serialVersionUID = 1567048369574496965L;
-	
+
 	private Integer userId;
-	
+
 	private BigDecimal remainAmount;
-	
+
 	private BigDecimal totalAmount;
 
 	public Integer getUserId() {
@@ -36,6 +36,5 @@ public class AccountVo implements Serializable{
 	public void setTotalAmount(BigDecimal totalAmount) {
 		this.totalAmount = totalAmount;
 	}
-	
 
 }

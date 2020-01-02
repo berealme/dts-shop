@@ -7,26 +7,26 @@ import java.util.Map;
 
 @SuppressWarnings("rawtypes")
 public class StatVo {
-    private String[] columns = new String[0];
+	private String[] columns = new String[0];
 	private List<Map> rows = new ArrayList<>();
 
-    public String[] getColumns() {
-        return columns;
-    }
+	public String[] getColumns() {
+		return columns;
+	}
 
-    public void setColumns(String[] columns) {
-        this.columns = columns;
-    }
+	public void setColumns(String[] columns) {
+		this.columns = columns;
+	}
 
-    public List<Map> getRows() {
-        return rows;
-    }
+	public List<Map> getRows() {
+		return rows;
+	}
 
-    public void setRows(List<Map> rows) {
-        this.rows = rows;
-    }
+	public void setRows(List<Map> rows) {
+		this.rows = rows;
+	}
 
-    public void add(Map... r) {
-        rows.addAll(Arrays.asList(r));
-    }
+	public void add(Map... r) {
+		rows.addAll(Arrays.asList(r));
+	}
 }

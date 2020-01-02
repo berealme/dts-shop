@@ -11,72 +11,71 @@ import com.qiguliuxing.dts.wx.dao.UserToken;
  * 维护用户token
  */
 public class UserTokenManager {
-    private static Map<String, UserToken> tokenMap = new HashMap<>();
-    private static Map<Integer, UserToken> idMap = new HashMap<>();
+	private static Map<String, UserToken> tokenMap = new HashMap<>();
+	private static Map<Integer, UserToken> idMap = new HashMap<>();
 
-    public static Integer getUserId(String token) {
-        UserToken userToken = tokenMap.get(token);
-        if (userToken == null) {
-            return null;
-        }
+	public static Integer getUserId(String token) {
+		UserToken userToken = tokenMap.get(token);
+		if (userToken == null) {
+			return null;
+		}
 
-        if (userToken.getExpireTime().isBefore(LocalDateTime.now())) {
-            tokenMap.remove(token);
-            idMap.remove(userToken.getUserId());
-            return null;
-        }
+		if (userToken.getExpireTime().isBefore(LocalDateTime.now())) {
+			tokenMap.remove(token);
+			idMap.remove(userToken.getUserId());
+			return null;
+		}
 
-        return userToken.getUserId();
-    }
+		return userToken.getUserId();
+	}
 
+	public static UserToken generateToken(Integer id) {
+		UserToken userToken = null;
 
-    public static UserToken generateToken(Integer id) {
-        UserToken userToken = null;
+		// userToken = idMap.get(id);
+		// if(userToken != null) {
+		// tokenMap.remove(userToken.getToken());
+		// idMap.remove(id);
+		// }
 
-//        userToken = idMap.get(id);
-//        if(userToken != null) {
-//            tokenMap.remove(userToken.getToken());
-//            idMap.remove(id);
-//        }
+		String token = CharUtil.getRandomString(32);
+		while (tokenMap.containsKey(token)) {
+			token = CharUtil.getRandomString(32);
+		}
 
-        String token = CharUtil.getRandomString(32);
-        while (tokenMap.containsKey(token)) {
-            token = CharUtil.getRandomString(32);
-        }
+		LocalDateTime update = LocalDateTime.now();
+		LocalDateTime expire = update.plusDays(1);
 
-        LocalDateTime update = LocalDateTime.now();
-        LocalDateTime expire = update.plusDays(1);
+		userToken = new UserToken();
+		userToken.setToken(token);
+		userToken.setUpdateTime(update);
+		userToken.setExpireTime(expire);
+		userToken.setUserId(id);
+		tokenMap.put(token, userToken);
+		idMap.put(id, userToken);
 
-        userToken = new UserToken();
-        userToken.setToken(token);
-        userToken.setUpdateTime(update);
-        userToken.setExpireTime(expire);
-        userToken.setUserId(id);
-        tokenMap.put(token, userToken);
-        idMap.put(id, userToken);
+		return userToken;
+	}
 
-        return userToken;
-    }
+	public static String getSessionKey(Integer userId) {
+		UserToken userToken = idMap.get(userId);
+		if (userToken == null) {
+			return null;
+		}
 
-    public static String getSessionKey(Integer userId) {
-        UserToken userToken = idMap.get(userId);
-        if (userToken == null) {
-            return null;
-        }
+		if (userToken.getExpireTime().isBefore(LocalDateTime.now())) {
+			tokenMap.remove(userToken.getToken());
+			idMap.remove(userId);
+			return null;
+		}
 
-        if (userToken.getExpireTime().isBefore(LocalDateTime.now())) {
-            tokenMap.remove(userToken.getToken());
-            idMap.remove(userId);
-            return null;
-        }
+		return userToken.getSessionKey();
+	}
 
-        return userToken.getSessionKey();
-    }
-
-    public static void removeToken(Integer userId) {
-        UserToken userToken = idMap.get(userId);
-        String token = userToken.getToken();
-        idMap.remove(userId);
-        tokenMap.remove(token);
-    }
+	public static void removeToken(Integer userId) {
+		UserToken userToken = idMap.get(userId);
+		String token = userToken.getToken();
+		idMap.remove(userId);
+		tokenMap.remove(token);
+	}
 }
