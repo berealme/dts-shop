@@ -3,6 +3,7 @@ package com.qiguliuxing.dts.db.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.alibaba.fastjson.JSONObject;
 import com.qiguliuxing.dts.db.domain.DtsOrder;
 import com.qiguliuxing.dts.db.domain.DtsOrderGoods;
 
@@ -254,7 +255,7 @@ public class OrderUtil {
 				orderStr = orderStr 
 						+ "<br>&nbsp;&nbsp;&nbsp;&nbsp;商品序列码" + "【" + dog.getGoodsSn() + "】;"
 						+ "<br>&nbsp;&nbsp;&nbsp;&nbsp;商品名称" + "【" + dog.getGoodsName() + "】;"
-						+ "<br>&nbsp;&nbsp;&nbsp;&nbsp;商品规格" + "【" + dog.getSpecifications() + "】;"
+						+ "<br>&nbsp;&nbsp;&nbsp;&nbsp;商品规格" + "【" + JSONObject.toJSONString(dog.getSpecifications()) + "】;"
 						+ "<br>&nbsp;&nbsp;&nbsp;&nbsp;商品规格数量" + "【" + dog.getNumber() + "】<br>";
 			}
 		}

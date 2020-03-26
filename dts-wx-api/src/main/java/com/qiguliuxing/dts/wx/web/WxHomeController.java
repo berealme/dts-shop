@@ -1,5 +1,6 @@
 package com.qiguliuxing.dts.wx.web;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -125,7 +126,8 @@ public class WxHomeController {
 			if (HomeCacheManager.hasData(HomeCacheManager.INDEX)) {
 				data = HomeCacheManager.getCacheData(HomeCacheManager.INDEX);
 				if (data != null) {// 加上这个判断，排除判断后到获取数据之间时间段清理的情况
-					logger.info("访问首页,存在缓存数据，除用户优惠券信息外，加载缓存数据");
+					LocalDateTime expire = (LocalDateTime) data.get("expireTime");
+					logger.info("访问首页,存在缓存数据，除用户优惠券信息外，加载缓存数据,有效期时间点："+ expire.toString());
 					data.put("couponList", couponListTask.get());
 					return ResponseUtil.ok(data);
 				}
@@ -146,7 +148,7 @@ public class WxHomeController {
 			Callable<List> topicListCallable = () -> topicService.queryList(0, SystemConfig.getTopicLimit());
 
 			// 团购专区
-			Callable<List> grouponListCallable = () -> grouponRulesService.queryList(0, 5);
+			Callable<List> grouponListCallable = () -> grouponRulesService.queryList(0, 6);
 
 			Callable<List> floorGoodsListCallable = this::getCategoryList;
 

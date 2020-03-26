@@ -1,22 +1,30 @@
 package com.qiguliuxing.dts.db.service;
 
-import com.github.pagehelper.PageHelper;
-import com.qiguliuxing.dts.db.dao.DtsUserMapper;
-import com.qiguliuxing.dts.db.domain.DtsUser;
-import com.qiguliuxing.dts.db.domain.DtsUserExample;
-import com.qiguliuxing.dts.db.domain.UserVo;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import javax.annotation.Resource;
-import java.time.LocalDateTime;
-import java.util.List;
+import com.github.pagehelper.PageHelper;
+import com.qiguliuxing.dts.db.dao.DtsUserAccountMapper;
+import com.qiguliuxing.dts.db.dao.DtsUserMapper;
+import com.qiguliuxing.dts.db.domain.DtsUser;
+import com.qiguliuxing.dts.db.domain.DtsUserAccount;
+import com.qiguliuxing.dts.db.domain.DtsUserAccountExample;
+import com.qiguliuxing.dts.db.domain.DtsUserExample;
+import com.qiguliuxing.dts.db.domain.UserVo;
 
 @Service
 public class DtsUserService {
+	
 	@Resource
 	private DtsUserMapper userMapper;
+	
+	@Resource
+	private DtsUserAccountMapper userAccountMapper;
 
 	public DtsUser findById(Integer userId) {
 		return userMapper.selectByPrimaryKey(userId);
@@ -101,5 +109,41 @@ public class DtsUserService {
 
 	public void deleteById(Integer id) {
 		userMapper.logicalDeleteByPrimaryKey(id);
+	}
+
+	/**
+	 * 审批代理申请
+	 * @param userAccount
+	 */
+	public void approveAgency(Integer userId,Integer settlementRate,String shareUrl) {
+		//获取账户数据
+		DtsUserAccountExample example = new DtsUserAccountExample();
+		example.or().andUserIdEqualTo(userId);
+		
+		DtsUserAccount dbAccount = userAccountMapper.selectOneByExample(example);
+		if (dbAccount == null) {
+			throw new RuntimeException("申请账户不存在");
+		}
+		dbAccount.setShareUrl(shareUrl);
+		if (!StringUtils.isEmpty(settlementRate)) {
+			dbAccount.setSettlementRate(settlementRate);
+		}
+		dbAccount.setModifyTime(LocalDateTime.now());
+		userAccountMapper.updateByPrimaryKey(dbAccount);
+		
+		//更新会员状态和类型
+		DtsUser user = findById(userId);
+		user.setUserLevel((byte) 2);//区域代理用户
+		user.setStatus((byte) 0);//正常状态
+		updateById(user);
+	}
+
+	public DtsUserAccount detailApproveByUserId(Integer userId) {
+		// 获取账户数据
+		DtsUserAccountExample example = new DtsUserAccountExample();
+		example.or().andUserIdEqualTo(userId);
+
+		DtsUserAccount dbAccount = userAccountMapper.selectOneByExample(example);
+		return dbAccount;
 	}
 }

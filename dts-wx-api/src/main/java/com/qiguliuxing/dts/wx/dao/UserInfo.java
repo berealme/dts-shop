@@ -23,6 +23,9 @@ public class UserInfo implements Serializable {
 	private String phone;
 	private Byte userLevel;// 用户层级 0 普通用户，1 VIP用户，2 区域代理用户
 	private String userLevelDesc;// 代理用户描述
+	
+	private Byte status;//状态
+	private String registerDate;//注册日期
 
 	public String getCountry() {
 		return country;
@@ -112,4 +115,20 @@ public class UserInfo implements Serializable {
 		this.userLevelDesc = userLevelDesc;
 	}
 
+	public String getRegisterDate() {
+		return registerDate;
+	}
+
+	public void setRegisterDate(String registerDate) {
+		this.registerDate = registerDate;
+	}
+
+	public Byte getStatus() {
+		return status;
+	}
+
+	public void setStatus(Byte status) {
+		this.status = status;
+	}
+	
 }

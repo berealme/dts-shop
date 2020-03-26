@@ -6,8 +6,8 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 
@@ -17,8 +17,7 @@ import com.aliyun.oss.model.PutObjectRequest;
 import com.aliyun.oss.model.PutObjectResult;
 
 public class AliyunStorage implements Storage {
-
-	private final Log logger = LogFactory.getLog(AliyunStorage.class);
+	private static final Logger logger = LoggerFactory.getLogger(AliyunStorage.class);
 
 	private String endpoint;
 	private String accessKeyId;
@@ -76,15 +75,21 @@ public class AliyunStorage implements Storage {
 	@Override
 	public void store(InputStream inputStream, long contentLength, String contentType, String keyName) {
 		try {
+			logger.info("阿里云存储OSS对象 内容长度：{},文件类型：{},KeyName:{}",contentLength,contentType,keyName);
 			// 简单文件上传, 最大支持 5 GB, 适用于小文件上传, 建议 20M以下的文件使用该接口
 			ObjectMetadata objectMetadata = new ObjectMetadata();
 			objectMetadata.setContentLength(contentLength);
 			objectMetadata.setContentType(contentType);
+			
 			// 对象键（Key）是对象在存储桶中的唯一标识。
 			PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, keyName, inputStream, objectMetadata);
+			
 			PutObjectResult putObjectResult = getOSSClient().putObject(putObjectRequest);
-			logger.info("阿里云存储结果code：" + putObjectResult.getResponse().getStatusCode());
+			if (putObjectResult != null && putObjectResult.getResponse() != null) {
+				logger.info("阿里云存储结果code：" + putObjectResult.getResponse().getStatusCode());
+			}
 		} catch (Exception ex) {
+			logger.error("阿里云存储 keyName：{} ,失败：{}",keyName,ex.getMessage());
 			ex.printStackTrace();
 		}
 

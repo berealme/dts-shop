@@ -15,5 +15,5 @@ public interface CommConsts {
 	
 	public static final String MISS_PARAMS = "缺少必要参数";
 	
-	public static final Long CACHE_EXPIRE_MINUTES = 60 * 24L; // 设置缓存 12小时，有效期单位 ： 分钟
+	public static final Long CACHE_EXPIRE_MINUTES = 60 * 6L; // 设置缓存 6小时，有效期单位 ： 分钟
 }

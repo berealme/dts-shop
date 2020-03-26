@@ -773,8 +773,9 @@ public class WxOrderService {
 
 			// 仅当发起者才创建分享图片
 			if (groupon.getGrouponId() == 0) {
+				BigDecimal actualPrice = new BigDecimal(order.getActualPrice().toString());
 				String url = qCodeService.createGrouponShareImage(grouponRules.getGoodsName(), grouponRules.getPicUrl(),
-						groupon);
+						groupon,actualPrice.add(grouponRules.getDiscount()),actualPrice);
 				groupon.setShareUrl(url);
 			}
 			groupon.setPayed(true);

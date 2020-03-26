@@ -294,9 +294,9 @@ public class WxGoodsController {
 	public Object list(Integer categoryId, Integer brandId, String keyword, Boolean isNew, Boolean isHot,
 			@LoginUser Integer userId, @RequestParam(defaultValue = "1") Integer page,
 			@RequestParam(defaultValue = "10") Integer size,
-			@Sort(accepts = { "add_time", "retail_price", "name", "browse",
-					"sales" }) @RequestParam(defaultValue = "add_time") String sort,
-			@Order @RequestParam(defaultValue = "desc") String order) {
+			@Sort(accepts = { "sort_order","add_time", "retail_price", "browse","name",
+					"sales" }) @RequestParam(defaultValue = "sort_order") String sort,
+			@Order @RequestParam(defaultValue = "asc") String order) {
 
 		logger.info("【请求开始】根据条件搜素商品,请求参数,categoryId:{},brandId:{},keyword:{}", categoryId, brandId, keyword);
 
@@ -312,7 +312,7 @@ public class WxGoodsController {
 		// 查询列表数据
 		List<DtsGoods> goodsList = goodsService.querySelective(categoryId, brandId, keyword, isHot, isNew, page, size,
 				sort, order);
-
+		
 		// 查询商品所属类目列表。
 		List<Integer> goodsCatIds = goodsService.getCatIds(brandId, keyword, isHot, isNew);
 		List<DtsCategory> categoryList = null;
@@ -324,10 +324,13 @@ public class WxGoodsController {
 
 		Map<String, Object> data = new HashMap<>();
 		data.put("goodsList", goodsList);
+		long count = PageInfo.of(goodsList).getTotal();
+		int totalPages = (int) Math.ceil((double) count / size);
 		data.put("count", PageInfo.of(goodsList).getTotal());
 		data.put("filterCategoryList", categoryList);
+		data.put("totalPages", totalPages);
 
-		logger.info("【请求结束】根据条件搜素商品,响应结果:查询的商品数量:{}", goodsList.size());
+		logger.info("【请求结束】根据条件搜素商品,响应结果:查询的商品数量:{},总数：{},总共 {} 页", goodsList.size(),count,totalPages);
 		return ResponseUtil.ok(data);
 	}
 

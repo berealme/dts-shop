@@ -25,7 +25,7 @@ public enum WxResponseCode {
 			"优惠券券码不正确"), COUPON_EXPIRED(743, "优惠券已经过期"), COUPON_NOT_CHANGE(744, "非兑换优惠券"),
 
 	// 提现错误
-	APPLY_WITHDRAWAL_FAIL(850, "申请提现金额不能大于可提现金额"), INVALID_COUPON(851, "无效购物券");
+	APPLY_WITHDRAWAL_FAIL(850, "申请提现金额不能大于可提现金额"), INVALID_COUPON(851, "无效购物券"), INVALID_USER(852, "无效用户");
 
 	private final Integer code;
 	private final String desc;

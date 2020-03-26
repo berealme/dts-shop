@@ -64,7 +64,7 @@ public class DtsGoodsService {
 	public List<DtsGoods> queryByCategory(List<Integer> catList, int offset, int limit) {
 		DtsGoodsExample example = new DtsGoodsExample();
 		example.or().andCategoryIdIn(catList).andIsOnSaleEqualTo(true).andDeletedEqualTo(false);
-		example.setOrderByClause("add_time  desc");
+		example.setOrderByClause("sort_order  asc");
 		PageHelper.startPage(offset, limit);
 
 		return goodsMapper.selectByExampleSelective(example, columns);

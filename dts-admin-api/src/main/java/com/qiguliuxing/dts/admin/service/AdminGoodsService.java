@@ -174,7 +174,7 @@ public class AdminGoodsService {
 		}
 
 		// 将生成的分享图片地址写入数据库
-		String url = qCodeService.createGoodShareImage(goods.getId().toString(), goods.getPicUrl(), goods.getName());
+		String url = qCodeService.createGoodShareImage(goods.getId().toString(), goods.getPicUrl(), goods.getName(),goods.getCounterPrice(),goods.getRetailPrice());
 		goods.setShareUrl(url);
 
 		// 商品基本信息表Dts_goods
@@ -205,7 +205,7 @@ public class AdminGoodsService {
 			product.setGoodsId(goods.getId());
 			productService.add(product);
 		}
-		qCodeService.createGoodShareImage(goods.getId().toString(), goods.getPicUrl(), goods.getName());
+		//qCodeService.createGoodShareImage(goods.getId().toString(), goods.getPicUrl(), goods.getName());
 
 		logger.info("【请求结束】商品管理->商品管理->编辑,响应结果:{}", "成功!");
 		return ResponseUtil.ok();
@@ -250,7 +250,7 @@ public class AdminGoodsService {
 		goodsService.add(goods);
 
 		// 将生成的分享图片地址写入数据库
-		String url = qCodeService.createGoodShareImage(goods.getId().toString(), goods.getPicUrl(), goods.getName());
+		String url = qCodeService.createGoodShareImage(goods.getId().toString(), goods.getPicUrl(), goods.getName(),goods.getCounterPrice(),goods.getRetailPrice());
 		if (!StringUtils.isEmpty(url)) {
 			goods.setShareUrl(url);
 			if (goodsService.updateById(goods) == 0) {

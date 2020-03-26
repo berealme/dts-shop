@@ -223,4 +223,10 @@ public class DtsAccountService {
 		accountTraceMapper.insert(record);
 	}
 
+	public void add(DtsUserAccount userAccount) {
+		userAccount.setCreateTime(LocalDateTime.now());
+		userAccount.setModifyTime(LocalDateTime.now());
+		userAccountMapper.insert(userAccount);
+	}
+
 }

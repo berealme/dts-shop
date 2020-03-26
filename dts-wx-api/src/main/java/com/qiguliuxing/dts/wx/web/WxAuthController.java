@@ -11,7 +11,9 @@ import static com.qiguliuxing.dts.wx.util.WxResponseCode.AUTH_NAME_REGISTERED;
 import static com.qiguliuxing.dts.wx.util.WxResponseCode.AUTH_OPENID_BINDED;
 import static com.qiguliuxing.dts.wx.util.WxResponseCode.AUTH_OPENID_UNACCESS;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -116,8 +118,18 @@ public class WxAuthController {
 		UserInfo userInfo = new UserInfo();
 		userInfo.setNickName(username);
 		userInfo.setAvatarUrl(user.getAvatar());
-		userInfo.setUserLevel(user.getUserLevel());// 用户层级
-		userInfo.setUserLevelDesc(UserTypeEnum.getInstance(user.getUserLevel()).getDesc());// 用户层级描述
+		
+		try {
+			String registerDate = new SimpleDateFormat("yyyy-MM-dd")
+					.format(user.getAddTime() == null ? user.getAddTime() : LocalDateTime.now());
+			userInfo.setRegisterDate(registerDate);
+			userInfo.setStatus(user.getStatus());
+			userInfo.setUserLevel(user.getUserLevel());// 用户层级
+			userInfo.setUserLevelDesc(UserTypeEnum.getInstance(user.getUserLevel()).getDesc());// 用户层级描述
+		} catch (Exception e) {
+			logger.error("账户登录：设置用户指定信息出错："+e.getMessage());
+			e.printStackTrace();
+		}
 
 		// token
 		UserToken userToken = null;
@@ -174,6 +186,7 @@ public class WxAuthController {
 		}
 
 		DtsUser user = userService.queryByOid(openId);
+		
 		if (user == null) {
 			user = new DtsUser();
 			user.setUsername(openId);
@@ -217,6 +230,17 @@ public class WxAuthController {
 		userInfo.setUserId(user.getId());
 		if (!StringUtils.isEmpty(user.getMobile())) {// 手机号存在则设置
 			userInfo.setPhone(user.getMobile());
+		}
+		try {
+			String registerDate = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+					.format(user.getAddTime() != null ? user.getAddTime() : LocalDateTime.now());
+			userInfo.setRegisterDate(registerDate);
+			userInfo.setStatus(user.getStatus());
+			userInfo.setUserLevel(user.getUserLevel());// 用户层级
+			userInfo.setUserLevelDesc(UserTypeEnum.getInstance(user.getUserLevel()).getDesc());// 用户层级描述
+		} catch (Exception e) {
+			logger.error("微信登录：设置用户指定信息出错："+e.getMessage());
+			e.printStackTrace();
 		}
 		result.put("userInfo", userInfo);
 

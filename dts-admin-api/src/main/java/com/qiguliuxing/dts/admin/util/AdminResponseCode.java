@@ -24,7 +24,8 @@ public enum AdminResponseCode {
 	// USER_INVALID_MOBILE(632,""),
 	// USER_NAME_EXIST(633,""),
 	// USER_MOBILE_EXIST(634,""),
-	ROLE_NAME_EXIST(640, "角色已经存在"), ROLE_SUPER_SUPERMISSION(641, "当前角色的超级权限不能变更");
+	ROLE_NAME_EXIST(640, "角色已经存在"), ROLE_SUPER_SUPERMISSION(641, "当前角色的超级权限不能变更"),
+	ARTICLE_NAME_EXIST(642,"公告或通知文章已经存在");
 
 	private final Integer code;
 	private final String desc;
