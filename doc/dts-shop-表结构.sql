@@ -1,4 +1,25 @@
+/*
+ Navicat Premium Data Transfer
 
+ Source Server         : dts_rds
+ Source Server Type    : MySQL
+ Source Server Version : 50725
+ Source Host           : localhost:3306
+ Source Schema         : demo
+
+ Target Server Type    : MySQL
+ Target Server Version : 50725
+ File Encoding         : 65001
+
+ Date: 26/03/2020 19:58:57
+*/
+
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for dts_account_trace
+-- ----------------------------
 DROP TABLE IF EXISTS `dts_account_trace`;
 CREATE TABLE `dts_account_trace`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -77,7 +98,7 @@ CREATE TABLE `dts_admin`  (
   `tel` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '联系电话',
   `mail` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '邮箱地址',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '管理员表' ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '管理员表' ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Table structure for dts_agency_share
@@ -351,7 +372,7 @@ CREATE TABLE `dts_goods`  (
   INDEX `cat_id`(`category_id`) USING BTREE,
   INDEX `brand_id`(`brand_id`) USING BTREE,
   INDEX `sort_order`(`sort_order`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 23858 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '商品基本信息表' ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 23857 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '商品基本信息表' ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Table structure for dts_goods_attribute
@@ -384,7 +405,7 @@ CREATE TABLE `dts_goods_product`  (
   `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
   `deleted` tinyint(1) NULL DEFAULT 0 COMMENT '逻辑删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 339179 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '商品货品表' ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 339177 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '商品货品表' ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Table structure for dts_goods_specification
@@ -401,7 +422,7 @@ CREATE TABLE `dts_goods_specification`  (
   `deleted` tinyint(1) NULL DEFAULT 0 COMMENT '逻辑删除',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `goods_id`(`goods_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 181709 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '商品规格表' ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 181707 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '商品规格表' ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Table structure for dts_groupon
@@ -552,7 +573,7 @@ CREATE TABLE `dts_permission`  (
   `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
   `deleted` tinyint(1) NULL DEFAULT 0 COMMENT '逻辑删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 73 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '权限表' ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 52 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '权限表' ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Table structure for dts_refund_trace
@@ -560,14 +581,10 @@ CREATE TABLE `dts_permission`  (
 DROP TABLE IF EXISTS `dts_refund_trace`;
 CREATE TABLE `dts_refund_trace`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `refund_sn` varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '退货单编号',
   `order_id` int(11) NOT NULL DEFAULT 0 COMMENT '订单表的订单ID',
   `order_sn` varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '订单编号',
-  `user_id` int(11) NOT NULL COMMENT '用户表的用户ID',
   `status` tinyint(3) NULL DEFAULT NULL COMMENT '审批状态：0 退款申请 1 退款审批通过 2 退款审批拒绝 3 退款完成',
   `refund_reason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '退款原因',
-  `refund_apply_amount` decimal(10, 2) NULL DEFAULT NULL COMMENT '退款申请金额',
-  `refund_amount` decimal(10, 2) NULL DEFAULT NULL COMMENT '实际退款额',
   `has_picture` tinyint(1) NULL DEFAULT 0 COMMENT '是否含有图片',
   `pic_urls` varchar(1023) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '退款质量图片地址列表 采用JSON数组格式',
   `add_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间,即退款申请时间',
@@ -642,7 +659,7 @@ CREATE TABLE `dts_storage`  (
   `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
   `deleted` tinyint(1) NULL DEFAULT 0 COMMENT '逻辑删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '文件存储表' ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '文件存储表' ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Table structure for dts_system
@@ -656,7 +673,7 @@ CREATE TABLE `dts_system`  (
   `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
   `deleted` tinyint(1) NULL DEFAULT 0 COMMENT '逻辑删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 17 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '系统配置表' ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 18 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '系统配置表' ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Table structure for dts_topic
@@ -740,3 +757,4 @@ CREATE TABLE `dts_user_formid`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 155 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Compact;
 
+SET FOREIGN_KEY_CHECKS = 1;
