@@ -1,25 +1,4 @@
-/*
- Navicat Premium Data Transfer
 
- Source Server         : dts_rds
- Source Server Type    : MySQL
- Source Server Version : 50725
- Source Host           : rm-wz9n837x74658o079jo.mysql.rds.aliyuncs.com:3306
- Source Schema         : dts-vip
-
- Target Server Type    : MySQL
- Target Server Version : 50725
- File Encoding         : 65001
-
- Date: 21/03/2020 13:46:58
-*/
-
-SET NAMES utf8mb4;
-SET FOREIGN_KEY_CHECKS = 0;
-
--- ----------------------------
--- Table structure for dts_account_trace
--- ----------------------------
 DROP TABLE IF EXISTS `dts_account_trace`;
 CREATE TABLE `dts_account_trace`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
