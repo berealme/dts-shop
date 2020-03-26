@@ -740,4 +740,3 @@ CREATE TABLE `dts_user_formid`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 155 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Compact;
 
-SET FOREIGN_KEY_CHECKS = 1;
