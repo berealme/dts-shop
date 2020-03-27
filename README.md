@@ -38,7 +38,7 @@
 
 ### 在线文档
 
-[项目文档](https://www.shequlianshang.com/doc)
+[项目文档地址：https://www.shequlianshang.com/doc](https://www.shequlianshang.com/doc)
 
 ### 小程序演示图
 <table border="0">
