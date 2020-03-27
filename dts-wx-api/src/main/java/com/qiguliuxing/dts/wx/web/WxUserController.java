@@ -78,7 +78,7 @@ public class WxUserController {
 		data.put("remainAmount", remainAmount);
 
 		// 查询用户的优惠券
-		int total = couponService.queryTotal();
+		int total = couponService.queryUserCouponCnt(userId);
 		data.put("couponCount", total);
 
 		logger.info("【请求结束】用户个人页面数据,响应结果:{}", JSONObject.toJSONString(data));

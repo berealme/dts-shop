@@ -193,4 +193,17 @@ public class DtsCouponService {
 				.andEndTimeLessThan(LocalDate.now()).andDeletedEqualTo(false);
 		return couponMapper.selectByExample(example);
 	}
+
+	/**
+	 * 查询用户的优惠券
+	 * @param userId
+	 * @return
+	 */
+	public int queryUserCouponCnt(Integer userId) {
+		DtsCouponUserExample example = new DtsCouponUserExample();
+		DtsCouponUserExample.Criteria criteria = example.createCriteria();
+		criteria.andUserIdEqualTo(userId);
+		criteria.andDeletedEqualTo(false);
+		return (int) couponUserMapper.countByExample(example);
+	}
 }
