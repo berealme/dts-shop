@@ -8,6 +8,22 @@ export function fetchList(query) {
   })
 }
 
+export function approveAgency(data) {
+  return request({
+    url: '/user/approveAgency',
+    method: 'post',
+    data
+  })
+}
+
+export function detailApprove(id) {
+  return request({
+    url: '/user/detailApprove',
+    method: 'get',
+    params: { id }
+  })
+}
+
 export function listAddress(query) {
   return request({
     url: '/address/list',
