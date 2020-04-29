@@ -25,16 +25,12 @@
 
       <div style="position:relative">
         <div class="tips">
-          <span> 超级管理员用户名: admin123</span>
-          <span> 超级管理员用户名：admin123</span>
+          <span> 超级管理员用户名: dtsadmin</span>
+          <span> 超级管理员用户名：dtsadmin</span>
         </div>
         <div class="tips">
-          <span> 商城管理员用户名: mall123</span>
-          <span> 商城管理员用户名：mall123</span>
-        </div>
-        <div class="tips">
-          <span> 推广管理员用户名: promotion123</span>
-          <span> 推广管理员用户名：promotion123</span>
+          <span> 商城管理员用户名: dtsdemo</span>
+          <span> 商城管理员用户名：dtsdemo</span>
         </div>
       </div>
     </el-form>
