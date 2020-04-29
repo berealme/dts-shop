@@ -167,7 +167,7 @@
 	    	<!-- test-online 环境 -->
 	    	<id>test-online</id>
 	    	<properties>
-	    	    <profile.active>test-online</profile.active>
+	    	    <profile.active>demo</profile.active>
 	    	    <logback.dir>./logs</logback.dir>
 	    	</properties>
     	</profile>
