@@ -1,10 +1,10 @@
 dts:
   # 开发者应该设置成自己的wx相关信息
   wx:
-    app-id: xxxx
-    app-secret: xxx
-    mch-id: xxxx
-    mch-key: xxxx
+    app-id: wx4901b319ace4f88a
+    app-secret: 45bae4a701e7ec35bca38fdedxxxxxx
+    mch-id: 1538666666
+    mch-key: 1538xxxxxx-1538xxxxxx-1538xxxxxx
     notify-url: https://test.dtsshop.com/demo/order/dtsNotify
     # 商户证书文件路径
     # 请参考“商户证书”一节 https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=4_3
